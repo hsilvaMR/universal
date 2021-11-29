@@ -65,8 +65,6 @@ class Communication extends Controller
     {
 
         $nome = trim($request->nome);
-        $ficheiro = $request->file('ficheiro');
-        $nomeFicheiro = trim($request->ficheiro);
         $descricao = trim($request->descricao);
         $tipo = trim($request->tipo) ? trim($request->tipo) : 'image';
 
@@ -76,12 +74,12 @@ class Communication extends Controller
         $token = str_random(12);
         $response  = "";
 
-        $validarFicheiro = json_decode(self::validarFicheiro($ficheiro, $path, $nomeFicheiro, $tipo), true);
+        $validarFicheiro = json_decode(self::validarFicheiro_v1($request, $path, $tipo), true);
         // public function validarFicheiro($ficheiro, $path,  $nomeFicheiro, $id, $tipo)
 
         if ($validarFicheiro['success'] == "ok") {
 
-            $newName = $validarFicheiro['nameFile'];
+            $nomeFicheiro = $validarFicheiro['nameFile'];
 
             $query = \DB::table('img_comercial')
                 ->where('nome', $nome)
@@ -98,7 +96,7 @@ class Communication extends Controller
                         'tipo' => $tipo,
                         'token' => $token,
                         'path' => $path,
-                        'file' => $$newName
+                        'file' => $nomeFicheiro
                     ]);
 
                 $response  = "success";
@@ -111,6 +109,53 @@ class Communication extends Controller
         }
 
         return  $response;
+    }
+
+
+    public function validarFicheiro_v1(Request $request,  $path, $tipo)
+    {
+        // verificar o ficheiro 
+        if ($request->hasFile('ficheiro') && $request->file('ficheiro')->isValid()) {
+
+            $ficheiro = $request->file('ficheiro');
+            $extensao = strtolower($ficheiro->getClientOriginalExtension());
+            $validExtesion = array("jpg", "jpeg",  "png", "svg", "pdf");
+            $pasta = base_path($path);
+            $id = str_random(3);
+            $response = ['init' => '0'];
+
+            // verifica extensão aceite
+            if (in_array($extensao, $validExtesion)) {
+
+                switch ($tipo) {
+
+                    case "Rotulo":
+                        $newName = 'COMUNIC-' . $tipo . $id . '.' . $extensao;
+                        break;
+                    case "Image":
+                        $newName = 'COMUNIC-' . $tipo . $id . '.' . $extensao;
+                        $ficheiro->move($pasta . '/assets/img', $newName);
+                        break;
+                }
+
+                //verifica tamanho suportado
+                $maxSize = 15728640;  //   15728640 byte = 15MB  https://convertlive.com/u/convert/megabytes/to/bytes#15
+                if (filesize($ficheiro) <= $maxSize) {
+
+                    $ficheiro->move($pasta . '/', $newName);
+                    $response = ['success' =>   "ok"];
+                    $response = ['file_name' =>   $newName];
+                } else {
+                    $response = ['error' =>  'tamanho nao suportado'];
+                }
+            } else {
+                $response = ['error' =>  'extensao invalido'];
+            }
+        } else {
+            $response = ['error' =>  'ficheiro invalido'];
+        }
+
+        return  json_encode($response, true);
     }
 
     public function validarFicheiro($ficheiro, $path, $nomeFicheiro,  $tipo)

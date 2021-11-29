@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Backoffice;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\File;
 
 use Cookie;
 
@@ -61,6 +63,60 @@ class Communication extends Controller
         // return "build add  area";
     }
 
+    public function addItemDB_v2(Request $request)
+    {
+
+        $nome = trim($request->nome);
+        $descricao = trim($request->descricao);
+        $tipo = trim($request->tipo);
+        $path = "public_html/img/comunicacao";
+        $token = str_random(12);
+        $response  =  ['init' =>  '0'];
+
+        if (!empty($nome) || !empty($descricao)) {
+
+            $validarFicheiro = json_decode(self::validarFicheiro_v1($request, $path, $tipo), true);
+
+
+            if ($validarFicheiro['success'] == "ok") {
+
+                $response['file_name'] = $validarFicheiro['file_name'];
+                $query = \DB::table('img_comercial')
+                    ->where('nome', $nome)
+                    ->orWhere('file',  $response['file_name'])
+                    ->first();
+                // check item DB 
+                if (empty($query->nome)) {
+
+                    \DB::table('img_comercial')
+                        ->insert([
+                            'nome' => $nome,
+                            'descricao' => $descricao,
+                            'atualizacao' => strtotime(date('Y-m-d H:i:s')),
+                            'tipo' => $tipo,
+                            'token' => $token,
+                            'path' => $path,
+                            'file' => $response['file_name']
+                        ]);
+
+                    $response = ['success' =>  'success'];
+                } else {
+                    self::apagarFicheiro($path,  $response['file_name']);
+                    $response = ['error' =>  'ficheiro existe'];
+                }
+            } else {
+                $response['error'] =  $validarFicheiro['error'];
+            }
+        } else {
+
+            self::apagarFicheiro($path,  $response['file_name']);
+            $response = ['error' =>  'campos vazios'];
+        }
+
+        return  json_encode($response, true);
+    }
+
+
     public function addItemDB(Request $request)
     {
 
@@ -73,20 +129,21 @@ class Communication extends Controller
         // $default_file =  "comunicacao.svg";
         $token = str_random(12);
         $response  = "";
-
-        $validarFicheiro = json_decode(self::validarFicheiro_v1($request, $path, $tipo), true);
+        $nomeFicheiro = "";
+        $validarFicheiro = "";
         // public function validarFicheiro($ficheiro, $path,  $nomeFicheiro, $id, $tipo)
+        $query = \DB::table('img_comercial')
+            ->where('nome', $nome)
+            // ->orWhere('file', $nomeFicheiro)
+            ->first();
 
-        if ($validarFicheiro['success'] == "ok") {
+        if (empty($query->nome)) {
 
-            $nomeFicheiro = $validarFicheiro['file_name'];
+            $validarFicheiro = json_decode(self::validarFicheiro_v1($request, $path, $tipo), true);
 
-            $query = \DB::table('img_comercial')
-                ->where('nome', $nome)
-                ->orWhere('file', $nomeFicheiro)
-                ->first();
+            if ($validarFicheiro['success'] == "ok") {
 
-            if (empty($query->nome)) {
+                $nomeFicheiro = $validarFicheiro['file_name'];
 
                 \DB::table('img_comercial')
                     ->insert([
@@ -102,6 +159,7 @@ class Communication extends Controller
                 $response  = "success";
             } else {
 
+                self::apagarFicheiro($path, $nomeFicheiro);
                 $response = "o ficheiro já existe";
             }
         } else {
@@ -111,6 +169,33 @@ class Communication extends Controller
         return  $response;
     }
 
+    public function apagarFicheiro($path, $filename)
+    {
+
+        Storage::delete($path . "/" . $filename);
+
+        //if (file_exists(base_path($path . '/' . $filename))) {
+        //File::delete($path . '/' . $filename);
+        //https://laravel.com/docs/5.8/filesystem
+        //Storage::delete($path . "/" . $filename);
+        // }
+    }
+
+
+
+    public function validarFicheiro_V2(Request $request,  $path, $tipo)
+    {
+
+
+        // verificar o ficheiro 
+        if ($request->hasFile('ficheiro') && $request->file('ficheiro')->isValid()) {
+
+            $ficheiro = $request->file('ficheiro');
+            $extensao = strtolower($ficheiro->getClientOriginalExtension());
+            $validExtesion = array("jpg", "jpeg",  "png", "svg", "pdf");
+            Storage::putFileAs('photos', new File($path . "/"), 'photo.jpg');
+        }
+    }
 
     public function validarFicheiro_v1(Request $request,  $path, $tipo)
     {
@@ -133,7 +218,7 @@ class Communication extends Controller
                         $newName = 'COMUNIC-' . $tipo . $id . '.' . $extensao;
                         break;
                     case "Image":
-                        $newName = 'COMUNIC-' . $tipo . $id . '.' . $extensao;
+                        $newName = 'COM-' . $tipo . '-' . $id . '.' . $extensao;
                         break;
                 }
 
@@ -143,8 +228,10 @@ class Communication extends Controller
 
                     // https://stackoverflow.com/questions/34443451/file-upload-laravel-5
                     $ficheiro->move($pasta . '/', $newName);
-                    $response = ['success' =>   "ok"];
-                    $response = ['file_name' =>   $newName];
+                    $response = [
+                        'success' =>   "ok",
+                        'file_name' =>   $newName
+                    ];
                 } else {
                     $response = ['error' =>  'tamanho nao suportado'];
                 }

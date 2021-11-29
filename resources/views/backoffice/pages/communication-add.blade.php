@@ -147,9 +147,21 @@ $('#addComunication').on('submit',function(e) {
           console.log( xhr.readyState )
           console.log( xhr.responseText )
            
+       },
+       success: function(data) {
+          
+        if(resposta=='success'){
+
+        alert(resposta);
+        console.log( resposta )
+        }
+        else {
+        alert(resposta);
+        console.log( resposta )
+}
        }
       })
-      .done(function(resposta){
+     /* .done(function(resposta){
         //console.log(resposta);
         /*try{ resp=$.parseJSON(resposta); }
         catch (e){            
@@ -160,7 +172,7 @@ $('#addComunication').on('submit',function(e) {
             $('#botoes').show();
             return;
             if(resp.estado=='sucess'){
-        }*/
+        }
 
         if(resposta=='success'){
 
@@ -171,7 +183,7 @@ $('#addComunication').on('submit',function(e) {
             alert(resposta);
             console.log( resposta )
         }
-      });
+      });*/
     });
 </script>
 

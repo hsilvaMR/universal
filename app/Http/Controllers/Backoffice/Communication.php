@@ -66,7 +66,7 @@ class Communication extends Controller
 
         $nome = trim($request->nome);
         $descricao = trim($request->descricao);
-        $tipo = trim($request->tipo) ? trim($request->tipo) : 'image';
+        $tipo = trim($request->tipo);
 
         $path = "public_html/img/comunicacao";
         // $asset_img_path = "/img/comunicacao";
@@ -79,7 +79,7 @@ class Communication extends Controller
 
         if ($validarFicheiro['success'] == "ok") {
 
-            $nomeFicheiro = $validarFicheiro['nameFile'];
+            $nomeFicheiro = $validarFicheiro['file_name'];
 
             $query = \DB::table('img_comercial')
                 ->where('nome', $nome)
@@ -134,7 +134,6 @@ class Communication extends Controller
                         break;
                     case "Image":
                         $newName = 'COMUNIC-' . $tipo . $id . '.' . $extensao;
-                        $ficheiro->move($pasta . '/assets/img', $newName);
                         break;
                 }
 
@@ -142,6 +141,7 @@ class Communication extends Controller
                 $maxSize = 15728640;  //   15728640 byte = 15MB  https://convertlive.com/u/convert/megabytes/to/bytes#15
                 if (filesize($ficheiro) <= $maxSize) {
 
+                    // https://stackoverflow.com/questions/34443451/file-upload-laravel-5
                     $ficheiro->move($pasta . '/', $newName);
                     $response = ['success' =>   "ok"];
                     $response = ['file_name' =>   $newName];

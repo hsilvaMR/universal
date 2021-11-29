@@ -1,0 +1,1 @@
+<div style="height:50px;background-color:#fbfbfb;line-height:50px;text-align:center;"><a href="{{ route('innovationPageV2') }}"><img height="20" src="/site_v2/img/site/2020.svg"></a></div>

@@ -1,0 +1,124 @@
+
+.ui-slider {
+  border-radius: 6px;
+  position: relative;
+  text-align: left;
+}
+
+.ui-slider .ui-slider-handle {
+  position: absolute;
+  z-index: 2;
+  width: 1.2em;
+  height: 1.2em;
+  cursor: default;
+  transition: none;
+  -webkit-transition: none;
+}
+
+.ui-slider .ui-slider-range {
+  background-position: 0 0;
+  border: 0;
+  border-radius: 6px;
+  display: block;
+  position: absolute;
+  z-index: 1;
+}
+
+/* For IE8 - See #6727 */
+.ui-slider.ui-state-disabled .ui-slider-handle,
+.ui-slider.ui-state-disabled .ui-slider-range {
+  filter: inherit;
+}
+
+.ui-slider-horizontal {
+  height: 10px;
+}
+
+.ui-slider-horizontal .ui-slider-handle {
+  margin-left: -9px;
+  top: -5px;
+}
+
+.ui-slider-horizontal .ui-slider-range {
+  top: 0;
+  height: 100%;
+}
+
+.ui-slider-horizontal .ui-slider-range-min {
+  left: 0;
+}
+
+.ui-slider-horizontal .ui-slider-range-max {
+  right: 0;
+}
+
+/* Component containers
+----------------------------------*/
+.ui-widget-content {
+  background-color: #fff;
+}
+
+.slider .ui-widget-header, .slider-middle .ui-widget-header{
+  background-color: #55B6DA;
+}
+
+
+
+.slider {
+  margin-top: 20px;
+}
+
+.slider-valor {
+  padding-top: 15px;
+  width:40px;
+  text-align: center;
+  float: right;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.slider-middle {
+  margin-top: 26px;
+}
+
+.slider-valor-middle {
+  padding-top: 19px;
+  width:60px;
+  text-align: center;
+  float: right;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* Interaction states
+----------------------------------*/
+.ui-state-default,
+.ui-widget-content .ui-state-default,
+.ui-widget-header .ui-state-default {
+  background: #0084B6;
+  border-radius: 50%;
+  height: 20px;
+  width: 20px;
+  cursor: pointer;
+}
+
+
+/* Color states
+----------------------------------*/
+.slider-azul .ui-widget-header{
+  background-color: #55B6DA;
+}
+.slider-azul .ui-state-default,
+.slider-azul .ui-widget-content .ui-state-default,
+.slider-azul .ui-widget-header .ui-state-default {
+  background: #0084B6;
+}
+
+.slider-vermelho .ui-widget-header{
+  background-color: #E65C53;
+}
+.slider-vermelho .ui-state-default,
+.slider-vermelho .ui-widget-content .ui-state-default,
+.slider-vermelho .ui-widget-header .ui-state-default {
+  background: #bf251b;
+}

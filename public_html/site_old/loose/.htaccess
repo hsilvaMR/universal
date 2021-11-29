@@ -1,0 +1,46 @@
+
+RewriteEngine on
+
+#RewriteEngine On
+#RewriteCond %{HTTPS} =on
+#RewriteCond %{HTTP_HOST} ^universal.com.pt [NC]
+#RewriteRule ^(.*)$ https://www.universal.com.pt/$1 [L,R=301]
+
+## COM HTTPS
+#RewriteCond %{HTTP:X-Forwarded-Proto} !https
+#RewriteCond %{HTTP_HOST} ^www.seudominio.com [NC]
+#RewriteRule ^(.*)$ https://www.seudominio.com/$1 [L,R=301]
+
+## COM OU SEM WWW
+RewriteCond %{HTTP_HOST} ^universal.com.pt [NC]
+RewriteCond %{REQUEST_URI} !^/[0-9]+\..+\.cpaneldcv$
+RewriteCond %{REQUEST_URI} !^/[A-F0-9]{32}\.txt(?:\ Comodo\ DCV)?$
+RewriteRule ^(.*)$ http://www.universal.com.pt/$1 [L,R=301]
+
+## ACEITAR SEM .PHP
+IndexIgnore *
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteCond %{REQUEST_URI} !^/[0-9]+\..+\.cpaneldcv$
+RewriteCond %{REQUEST_URI} !^/[A-F0-9]{32}\.txt(?:\ Comodo\ DCV)?$
+RewriteRule !.*\.php$ %{REQUEST_FILENAME}.php [QSA,L]
+
+RewriteCond %{HTTP_USER_AGENT} libwww-perl.* 
+RewriteCond %{REQUEST_URI} !^/[0-9]+\..+\.cpaneldcv$
+RewriteCond %{REQUEST_URI} !^/[A-F0-9]{32}\.txt(?:\ Comodo\ DCV)?$
+RewriteRule .* – [F,L]
+
+## PAGINAS DE ERRO
+ErrorDocument 404 /404.php
+ErrorDocument 500 /404.php
+
+# -----------------------------------------------------------------------
+# Compressing output.
+# -----------------------------------------------------------------------
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css application/json
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE text/xml application/xml text/x-component
+    AddOutputFilterByType DEFLATE application/xhtml+xml application/rss+xml application/atom+xml
+    AddOutputFilterByType DEFLATE image/x-icon image/svg+xml application/vnd.ms-fontobject application/x-font-ttf font/opentype
+</Ifmodule>
+Options -Indexes

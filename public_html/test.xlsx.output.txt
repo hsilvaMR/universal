@@ -1,0 +1,2 @@
+inputFilename  = [test.xlsx]
+outputFilename = [test.xlsx.output.txt]

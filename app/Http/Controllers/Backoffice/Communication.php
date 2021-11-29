@@ -100,6 +100,8 @@ class Communication extends Controller
                         'path' => $path,
                         'file' => $$newName
                     ]);
+
+                $response  = "success";
             } else {
 
                 $response = "o ficheiro já existe";
@@ -127,9 +129,7 @@ class Communication extends Controller
         $extensao = strtolower($ficheiro->getClientOriginalExtension());
         $validExtesion = array("jpg", "jpeg",  "png", "svg", "pdf");
         $id = str_random(3);
-        //$validExtesion = array("jpg", "jpeg",  "png", "svg", "pdf", "JPG", "JPEG", "PNG", "PDF", "SVG");
-
-        if (count($ficheiro)) {
+        if (!empty($ficheiro)) {
 
             // verifica extensão aceite
             if (in_array($extensao, $validExtesion)) {

@@ -11,7 +11,7 @@
 </div>
 
 {{--  form  --}}
-<form id="adminFormA" method="POST" enctype="multipart/form-data" action="{{ route('codeFormB') }}">
+<form id="addComunication" method="POST" enctype="multipart/form-data" action="{{ route('comunAdd_DB') }}">
     {{ csrf_field() }}
     <input type="hidden" id="id" name="id" value="@if(isset($codigo->id)){{ $codigo->id }}@endif">
     <div class="row">
@@ -124,9 +124,55 @@
     }
   }
 
-  
+//   add data ajax 
+$('#addComunication').on('submit',function(e) {
+     /* $("#labelSucesso").hide();
+      $("#labelErros").hide();
+      $('#loading').show();
+      $('#botoes').hide();*/
+      //var editorContent = tinyMCE.get('message').getContent();
+      var form = $(this);
+      e.preventDefault();
+      $.ajax({
+        type: "POST",
+        url: form.attr('action'),
+        data: new FormData(this),
+        contentType: false,
+        processData: false,
+        cache: false,
+        error: function (xhr,status, error) {
+            //alert(ajaxContext.responseText)
+          console.log( xhr.status)
+          console.log( xhr.statusText )
+          console.log( xhr.readyState )
+          console.log( xhr.responseText )
+           
+       }
+      })
+      .done(function(resposta){
+        //console.log(resposta);
+        /*try{ resp=$.parseJSON(resposta); }
+        catch (e){            
+            if(resposta){ $("#spanErro").html(resposta); }
+            else{ $("#spanErro").html('ERROR'); }
+            $("#labelErros").show();
+            $('#loading').hide();
+            $('#botoes').show();
+            return;
+            if(resp.estado=='sucess'){
+        }*/
 
+        if(resposta=='success'){
 
+            alert(resposta);
+            console.log( resposta )
+        }
+        else {
+            alert(resposta);
+            console.log( resposta )
+        }
+      });
+    });
 </script>
 
 @stop

@@ -327,8 +327,8 @@ Route::group(['prefix' => 'admin'], function () {
 
 		//Communication
 		Route::get('/communication', 'Backoffice\Communication@index')->name('mainPageComun');
-		Route::get('/communication/add', 'Backoffice\Communication@addItemPage')->name('comunAdd');
-		//Route::get('/orders-invoice/{id}', 'Backoffice\Orders@ordersInvoice')->name('invoiceOrderPageB');
+		Route::get('/communication/add-page', 'Backoffice\Communication@addItemPage')->name('comunAdd');
+		Route::post('/communication/add', 'Backoffice\Communication@addItemDB')->name('comunAdd_DB');
 
 		Route::post('/orders-addLine', 'Backoffice\Orders@addLineProduct')->name('ordersAddLineProductPageB');
 		Route::post('/orders-form', 'Backoffice\Orders@formEdit')->name('ordersFormB');

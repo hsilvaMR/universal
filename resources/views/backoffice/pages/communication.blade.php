@@ -36,7 +36,7 @@
           {{-- action edit | delete | download | share --}}
           <td class="table-opcao">
             {{--  editar  --}}
-            <a href="{{ route('companiesEditPageB',['id'=>$val['id']]) }}" class="table-opcao">
+            <a href="{{ route('comunEdit',['id'=>$val['id']]) }}" class="table-opcao">
               <i class="fas fa-pencil-alt"></i>&nbsp;{{trans('backoffice.Edit')}}
             </a>&ensp;
             {{-- apagar  --}}

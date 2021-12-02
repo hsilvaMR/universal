@@ -73,6 +73,8 @@ class Communication extends Controller
         $token = str_random(12);
         $response  =  ['init' =>  '0'];
 
+
+
         if (!empty($nome) || !empty($descricao)) {
 
             $validarFicheiro = json_decode(self::validarFicheiro_v1($request, $path, $tipo), true);
@@ -171,7 +173,7 @@ class Communication extends Controller
     public function apagarFicheiro($path, $filename)
     {
 
-        Storage::delete($path . "/" . $filename);
+        \Storage::delete($path . "/" . $filename);
 
         //if (file_exists(base_path($path . '/' . $filename))) {
         //File::delete($path . '/' . $filename);
@@ -305,12 +307,84 @@ class Communication extends Controller
         return  json_encode($response, true);
     }
 
-    public function editarItem($id)
+    public function editarItem_v1($id)
     {
     }
 
     public function editarPage($id)
     {
+
+        $this->dados['headTitulo'] = trans('backoffice.comunicTitulo');
+        $this->dados['separador'] = "sellerComuni";
+        $this->dados['funcao'] = "editComuni";
+        $this->dados['obj'] = \DB::table('img_comercial')->where('id', $id)->first();
+
+        return view('backoffice/pages/communication-add', $this->dados);
+    }
+
+    public function updateItem(Request $request)
+    {
+        $id = trim($request->id);
+        $nome = trim($request->nome);
+        $descricao = trim($request->descricao);
+        $tipo = trim($request->tipo);
+        $response  =  ['init' =>  '0'];
+        $path = "public_html/img/comunicacao";
+        $currentFile = trim($request->uploads_xs);
+
+        $ficheiro = $request->file('ficheiro');
+        if (filesize($ficheiro) > 0  && !empty($ficheiro)) {
+
+            $query = \DB::table('img_comercial')->where('id', $id)->first();
+            $currentFile = $query->file;
+            self::apagarFicheiro($path, $currentFile);
+
+            $validarFicheiro = json_decode(self::validarFicheiro_v1($request, $path, $tipo), true);
+
+            if ($validarFicheiro['success'] == "ok") {
+
+                $response['file_name'] = $validarFicheiro['file_name'];
+
+                if (!empty($id) ||  !empty($nome)) {
+                    $updateStatus =  \DB::table('img_comercial')->where('id', $id)->update([
+                        'nome' => $nome,
+                        'descricao' => $descricao,
+                        'atualizacao' => strtotime(date('Y-m-d H:i:s')),
+                        'tipo' => $tipo,
+                        'token' => str_random(12),
+                        'path' => $path,
+                        'file' => $response['file_name']
+                    ]);
+
+                    $response = [
+                        'estado' => 'sucesso',
+                        'update' => $updateStatus
+                    ];
+                } else {
+
+                    self::apagarFicheiro($path, $response['file_name']);
+                    $response = ['error' =>  'Deve Preencher os campos'];
+                }
+            } else {
+                $response['error'] =  $validarFicheiro['error'];
+            }
+        } else {
+
+            $updateStatus =  \DB::table('img_comercial')->where('id', $id)->update([
+                'nome' => $nome,
+                'descricao' => $descricao,
+                'atualizacao' => strtotime(date('Y-m-d H:i:s')),
+                'tipo' => $tipo,
+                'token' => str_random(12),
+                'path' => $path,
+                'file' => $currentFile
+            ]);
+            $response = [
+                'estado' => 'sucesso',
+                'update' => $updateStatus
+            ];
+        }
+        return json_encode($response, true);
     }
 
     public function apagarItem(Request $request)

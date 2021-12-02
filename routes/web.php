@@ -325,13 +325,16 @@ Route::group(['prefix' => 'admin'], function () {
 		Route::get('/orders-new/{id}', 'Backoffice\Orders@newPageOrders')->name('ordersNewPageB');
 		Route::get('/orders-invoice/{id}', 'Backoffice\Orders@ordersInvoice')->name('invoiceOrderPageB');
 
-		//Communication
+		//COMUNICACAO
 		Route::get('/communication', 'Backoffice\Communication@index')->name('mainPageComun');
+		//add page 
 		Route::get('/communication/add-page', 'Backoffice\Communication@addItemPage')->name('comunAdd');
 		Route::post('/communication/add', 'Backoffice\Communication@addItemDB')->name('comunAdd_DB');
-		Route::get('/communication/edit-page', 'Backoffice\Communication@addItemPage')->name('comunEdit');
-		Route::post('/communication/edit', 'Backoffice\Communication@editarItem')->name('comunEdit_DB');
-		Route::post('/communication/edit-page', 'Backoffice\Communication@apagarItem')->name('comuniDelete');
+		//edit page 
+		Route::get('/communication/edit-page/{id}', 'Backoffice\Communication@editarPage')->name('comunEdit');
+		Route::post('/communication/edit', 'Backoffice\Communication@updateItem')->name('comunEdit_DB');
+		// delete post 
+		Route::post('/communication/delete', 'Backoffice\Communication@apagarItem')->name('comuniDelete');
 
 
 		Route::post('/orders-addLine', 'Backoffice\Orders@addLineProduct')->name('ordersAddLineProductPageB');

@@ -94,7 +94,7 @@
             </div>
             <div class="modal-body">{!! trans('backoffice.savedSuccessfully') !!}</div>
             <div class="modal-footer">
-                <a href="{{ route('cookingPageB') }}" class="abt bt-cinza"><i class="fas fa-arrow-left"></i>
+                <a href="{{ route('mainPageComun') }}" class="abt bt-cinza"><i class="fas fa-arrow-left"></i>
                     {{ trans('backoffice.Back') }}</a>&nbsp;
                 <a href="javascript:;" class="abt bt-verde" data-dismiss="modal"><i class="fas fa-check"></i>
                     {{ trans('backoffice.Ok') }}</a>
@@ -126,11 +126,7 @@
 
 //   add data ajax 
 $('#addComunication').on('submit',function(e) {
-     /* $("#labelSucesso").hide();
-      $("#labelErros").hide();
-      $('#loading').show();
-      $('#botoes').hide();*/
-      //var editorContent = tinyMCE.get('message').getContent();
+    
       var form = $(this);
       e.preventDefault();
       $.ajax({
@@ -145,20 +141,25 @@ $('#addComunication').on('submit',function(e) {
           console.log( xhr.status)
           console.log( xhr.statusText )
           console.log( xhr.readyState )
-          console.log( xhr.responseText )
-           
+          console.log( xhr.responseText )     
        },
        success: function(data) {
-          
-        if(resposta=='success'){
 
-        alert(resposta);
+        resp=$.parseJSON(data);
+       
+          
+        if(resp.success=='success'){
+
         console.log( resposta )
+         //  $('#addComunication')[0].reset();  uploads_xs
+           $("#addComunication").trigger("reset");
+           $("#uploads_xs").empty();
+
+          $('#myModalSave').modal('show');
         }
         else {
-        alert(resposta);
-        console.log( resposta )
-}
+          console.log( resposta )
+        }
        }
       })
      /* .done(function(resposta){

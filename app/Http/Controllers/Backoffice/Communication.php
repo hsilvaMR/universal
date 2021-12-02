@@ -77,7 +77,6 @@ class Communication extends Controller
 
             $validarFicheiro = json_decode(self::validarFicheiro_v1($request, $path, $tipo), true);
 
-
             if ($validarFicheiro['success'] == "ok") {
 
                 $response['file_name'] = $validarFicheiro['file_name'];
@@ -215,10 +214,10 @@ class Communication extends Controller
                 switch ($tipo) {
 
                     case "Rotulo":
-                        $newName = 'COMUNIC-' . $tipo . $id . '.' . $extensao;
+                        $newName = 'COMU - ' . $tipo . $id . '.' . $extensao;
                         break;
                     case "Image":
-                        $newName = 'COM-' . $tipo . '-' . $id . '.' . $extensao;
+                        $newName = 'COMU -' . $tipo . '-' . $id . '.' . $extensao;
                         break;
                 }
 
@@ -304,6 +303,14 @@ class Communication extends Controller
         }
 
         return  json_encode($response, true);
+    }
+
+    public function editarItem($id)
+    {
+    }
+
+    public function editarPage($id)
+    {
     }
 
     public function generateUrl($id, $token, $file)

@@ -331,6 +331,7 @@ Route::group(['prefix' => 'admin'], function () {
 		Route::post('/communication/add', 'Backoffice\Communication@addItemDB')->name('comunAdd_DB');
 		Route::get('/communication/edit-page', 'Backoffice\Communication@addItemPage')->name('comunEdit');
 		Route::post('/communication/edit', 'Backoffice\Communication@editarItem')->name('comunEdit_DB');
+		Route::post('/communication/edit-page', 'Backoffice\Communication@apagarItem')->name('comuniDelete');
 
 
 		Route::post('/orders-addLine', 'Backoffice\Orders@addLineProduct')->name('ordersAddLineProductPageB');

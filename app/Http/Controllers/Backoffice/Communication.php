@@ -313,6 +313,78 @@ class Communication extends Controller
     {
     }
 
+    public function apagarItem(Request $request)
+    {
+
+        $id = trim($request->id);
+        $query = \DB::table('img_comercial')->where('id', $id)->first();
+        $response  =  ['init' =>  '0'];
+
+        if (!empty($query->id)) {
+
+            $file = $query->file;
+            $path = $query->path;
+            if (file_exists(base_path($path . "/" .  $file))) {
+
+                \File::delete($path . "/" . $file);
+                \DB::table('img_comercial')->where('id', $id)->delete();
+                $response = ['success' =>  'success'];
+            } else {
+                $response = ['error' =>  'error to delete file'];
+            }
+        } else {
+            $response = ['error' =>  'id nao existe'];
+        }
+        return  json_encode($response, true);
+    }
+
+
+    //apagar v2
+    public function apagarItem_v2(Request $request)
+    {
+        $id = trim($request->id);
+        $linha = \DB::table('empresas')->where('id', $id)->first();
+        if (isset($linha->id) && $linha->id) {
+            //Apagar Logotipo
+            if ($linha->logotipo && file_exists(base_path('public_html/img/empresas/' . $linha->logotipo))) {
+                \File::delete('../public_html/img/empresas/' . $linha->logotipo);
+                //\File::deleteDirectory('../public_html/img/empresas/'.$linha->logotipo);
+            }
+            //Apagar documentos (certidao, ies, validação comerciantes)
+            if ($linha->certidao && file_exists(base_path('public_html/doc/companies/' . $linha->certidao))) {
+                \File::delete('../public_html/doc/companies/' . $linha->certidao);
+            }
+            if ($linha->ies) {
+                $obj = json_decode($linha->ies);
+                foreach ($obj as $value) {
+                    if ($value->ies && file_exists(base_path('public_html/doc/companies/' . $value->ies))) {
+                        \File::delete('../public_html/doc/companies/' . $value->ies);
+                    }
+                }
+            }
+            //Apagar tickets
+            $tikQuery = \DB::table('tickets')->where('id_empresa', $id)->get();
+            foreach ($tikQuery as $valor) {
+                $msgQuery = \DB::table('tickets_msg')->where('id_ticket', $valor->id)->get();
+                foreach ($msgQuery as $val) {
+                    if ($val->ficheiros) {
+                        $obj = json_decode($val->ficheiros);
+                        foreach ($obj as $file) {
+                            if ($file->ficheiro && file_exists(base_path('public_html/doc/support/' . $file->ficheiro))) {
+                                \File::delete('../public_html/doc/support/' . $file->ficheiro);
+                            }
+                        }
+                    }
+                }
+            }
+            //Manter as encomendas
+            \DB::table('empresas')->where('id', $id)->delete();
+            return 'sucesso';
+        }
+        return 'erro';
+    }
+
+
     public function generateUrl($id, $token, $file)
     {
 

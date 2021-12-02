@@ -150,7 +150,7 @@ $('#addComunication').on('submit',function(e) {
           
         if(resp.success=='success'){
 
-        console.log( resposta )
+        console.log( resp.succes )
          //  $('#addComunication')[0].reset();  uploads_xs
            $("#addComunication").trigger("reset");
            $("#uploads_xs").empty();
@@ -158,6 +158,7 @@ $('#addComunication').on('submit',function(e) {
           $('#myModalSave').modal('show');
         }
         else {
+           alert(resp.succes);
           console.log( resposta )
         }
        }

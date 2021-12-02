@@ -446,6 +446,8 @@ return [
     'comuniFrFile' => 'Ficheiro',
     'comuniFrTypeR' => 'Rótulo',
     'comuniFrTypeImg' => 'Imagen',
+    'comuniNotifiDelete' => 'Removido com sucesso',
+    'comuniNotifiDeleteMessage' => '<p>Tem a certeza que deseja apagar este <b>Item</b>?</p>',
 
 
 

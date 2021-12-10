@@ -54,6 +54,8 @@
                     <label class="a-dotted-white" name="uploads_xs" id="uploads_xs">&nbsp; @if(isset($obj->file) &&
                         $obj->file)
                         {{ $obj->file}} @endif</label>
+                    <input type="hidden" name="fileName"
+                        value="@if(isset($obj->file) && $obj->file) {{ $obj->file}} @endif">
                     @endif
                 </div>
                 <label for="selecao-arquivo_xs" class="lb-40 bt-azul float-right">

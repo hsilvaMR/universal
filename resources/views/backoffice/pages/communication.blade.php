@@ -45,13 +45,11 @@
               <i class="fas fa-trash-alt"></i>&nbsp;{{trans('backoffice.Delete')}}
             </span>&ensp;
             {{-- download --}}
-            <span class="table-opcao" onclick="$('#id_modal').val({{ $val['id'] }});" data-toggle="modal"
-              data-target="#myModalDelete">
+            <span class="table-opcao" id="btnDownload">
               <i class="fas fa-file-download"></i>&nbsp;{{trans('backoffice.Delete')}}
             </span>&ensp;
             {{-- share link  --}}
-            <span class="table-opcao" onclick="$('#id_modal').val({{ $val['id'] }});" data-toggle="modal"
-              data-target="#myModalDelete">
+            <span class="table-opcao" id="btnShareLink">
               <i class="fas fa-cloud-download-alt"></i>&nbsp;{{trans('backoffice.Delete')}}
             </span>
           </td>
@@ -125,6 +123,42 @@
       }
     });
   }
+
+  function downloadFile(id){
+
+   {{ $var }} = id 
+    $.ajax({
+      type: "POST",
+      url: '{{ route('downloadPage'), $var  }}',
+      data: { id:id },
+      dataType : 'text', 
+      headers:{ 'X-CSRF-Token':'{!! csrf_token() !!}' },
+      error: function (xhr,status, error) {
+          console.log( xhr.responseText ) 
+          alert(xhr.responseText );    
+       }
+    })
+    .done(function(resposta) {
+      alert(resposta);
+    });
+  }
+
+
+  function copyLink_v2(id){
+        
+        var url = document.getElementById("id_copy-"+id);
+        copyToClipboard(url.value);
+     }
+     
+     function copyToClipboard(text) {
+         var sampleTextarea = document.createElement("textarea");
+         document.body.appendChild(sampleTextarea);
+         sampleTextarea.value = text; //save main text in it
+         sampleTextarea.select(); //select textarea contenrs
+         document.execCommand("copy");
+         document.body.removeChild(sampleTextarea);
+    }
+     
 
   //<!-- PAGINAR -->
   $(document).ready(function(){

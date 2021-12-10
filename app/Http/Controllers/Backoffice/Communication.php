@@ -26,6 +26,7 @@ class Communication extends Controller
         $path = "public_html/img/comunicacao";
         $asset_img_path = "/img/comunicacao";
         $default_file =  "comunicacao.svg";
+        $array = [];
 
         $query = \DB::table('img_comercial')->orderBy('id', 'DESC')->get();
         foreach ($query as $tblCom) {
@@ -47,6 +48,7 @@ class Communication extends Controller
         }
 
         //return "build communication area";
+        $this->dados['array'] = $array;
         return view('backoffice/pages/communication', $this->dados);
     }
 
@@ -173,13 +175,17 @@ class Communication extends Controller
     public function apagarFicheiro($path, $filename)
     {
 
-        \Storage::delete($path . "/" . $filename);
+        $response = "";
 
-        //if (file_exists(base_path($path . '/' . $filename))) {
-        //File::delete($path . '/' . $filename);
-        //https://laravel.com/docs/5.8/filesystem
-        //Storage::delete($path . "/" . $filename);
-        // }
+        if (file_exists(base_path($path) . '/' .  $filename)) {
+
+            \File::delete(base_path($path) . '/' . $filename);
+
+            $response = "delete";
+        } else {
+            $response = "error | empty file";
+        }
+        return $response;
     }
 
 
@@ -330,14 +336,14 @@ class Communication extends Controller
         $tipo = trim($request->tipo);
         $response  =  ['init' =>  '0'];
         $path = "public_html/img/comunicacao";
-        $currentFile = trim($request->uploads_xs);
+        $currentFile = trim($request->fileName);
 
         $ficheiro = $request->file('ficheiro');
         if (filesize($ficheiro) > 0  && !empty($ficheiro)) {
 
             $query = \DB::table('img_comercial')->where('id', $id)->first();
             $currentFile = $query->file;
-            self::apagarFicheiro($path, $currentFile);
+            $response["deleteMessage"]  = self::apagarFicheiro($path, $currentFile);
 
             $validarFicheiro = json_decode(self::validarFicheiro_v1($request, $path, $tipo), true);
 
@@ -349,7 +355,7 @@ class Communication extends Controller
                     $updateStatus =  \DB::table('img_comercial')->where('id', $id)->update([
                         'nome' => $nome,
                         'descricao' => $descricao,
-                        'atualizacao' => strtotime(date('Y-m-d H:i:s')),
+                        'atualizacao' => date('Y-m-d H:i:s'),
                         'tipo' => $tipo,
                         'token' => str_random(12),
                         'path' => $path,
@@ -362,7 +368,7 @@ class Communication extends Controller
                     ];
                 } else {
 
-                    self::apagarFicheiro($path, $response['file_name']);
+                    $response["deleteMessage"]  = self::apagarFicheiro($path, $response['file_name']);
                     $response = ['error' =>  'Deve Preencher os campos'];
                 }
             } else {
@@ -373,7 +379,7 @@ class Communication extends Controller
             $updateStatus =  \DB::table('img_comercial')->where('id', $id)->update([
                 'nome' => $nome,
                 'descricao' => $descricao,
-                'atualizacao' => strtotime(date('Y-m-d H:i:s')),
+                'atualizacao' => date('Y-m-d H:i:s'),
                 'tipo' => $tipo,
                 'token' => str_random(12),
                 'path' => $path,
@@ -381,7 +387,8 @@ class Communication extends Controller
             ]);
             $response = [
                 'estado' => 'sucesso',
-                'update' => $updateStatus
+                'update' => $updateStatus,
+                'file' => $currentFile
             ];
         }
         return json_encode($response, true);
@@ -398,14 +405,45 @@ class Communication extends Controller
 
             $file = $query->file;
             $path = $query->path;
-            if (file_exists(base_path($path . "/" .  $file))) {
+
+
+            $id = trim($request->id);
+            $query = \DB::table('img_comercial')->where('id', $id)->first();
+            $response  =  ['init' =>  '0'];
+
+            if (!empty($query->id)) {
+
+                $file = $query->file;
+                $path = $query->path;
+
+                //apagarFicheiro($path,  $file)
+                self::apagarFicheiro($path,  $file);
+                \DB::table('img_comercial')->where('id', $id)->delete();
+                $response = ['success' =>  'success'];
+
+                /*if (file_exists(base_path($path . "/" .  $file))) {
+    
+                    \File::delete($path . "/" . $file);
+                    \DB::table('img_comercial')->where('id', $id)->delete();
+                    $response = ['success' =>  'success'];
+                } else {
+                    $response = ['error' =>  'error to delete file'];
+                }*/
+            } else {
+                $response = ['error' =>  'id nao existe'];
+            }
+            return  json_encode($response, true);
+
+
+
+            /*if (file_exists(base_path($path . "/" .  $file))) {
 
                 \File::delete($path . "/" . $file);
                 \DB::table('img_comercial')->where('id', $id)->delete();
                 $response = ['success' =>  'success'];
             } else {
                 $response = ['error' =>  'error to delete file'];
-            }
+            }*/
         } else {
             $response = ['error' =>  'id nao existe'];
         }
@@ -458,6 +496,25 @@ class Communication extends Controller
         return 'erro';
     }
 
+
+    public function downloadFile_v2($id)
+    {
+
+        $query = \DB::table('img_comercial')->where('id', $id)->first();
+        $ficheiro = $query->file;
+        $path =  $query->path;
+
+        //$file =  $path ."/".$ficheiro ;
+        $file =  "../public_html/img/comunicacao/" . $ficheiro;
+        $name = basename($file);
+        return response()->download($file, $name);
+    }
+
+    public function downloadFile_v1($ficheiro)
+    {
+
+        return response()->download(base_path($path . "/" . $ficheiro));
+    }
 
     public function generateUrl($id, $token, $file)
     {

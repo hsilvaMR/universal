@@ -335,6 +335,8 @@ Route::group(['prefix' => 'admin'], function () {
 		Route::post('/communication/edit', 'Backoffice\Communication@updateItem')->name('comunEdit_DB');
 		// delete post 
 		Route::post('/communication/delete', 'Backoffice\Communication@apagarItem')->name('comuniDelete');
+		// download  item 
+		Route::post('/communication/download/{id}', 'Backoffice\Communication@downloadFile')->name('downloadPage');
 
 
 		Route::post('/orders-addLine', 'Backoffice\Orders@addLineProduct')->name('ordersAddLineProductPageB');

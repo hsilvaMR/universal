@@ -42,6 +42,13 @@ Route::get('/', 'Site_v2\Home@index')->name('homePageV2');
 Route::get('/universal-{tipo}', 'Site_v2\Home@pageProduct')->name('productPageV2');
 Route::get('/page-universal', 'Site_v2\Home@pageUniversal')->name('universalPageV2');
 
+/* download de automatico de ficheiros  */
+Route::get('/communication/download/{id}', 'Backoffice\Communication@downloadFile')->name('downloadPage');
+
+// area publica comunicacao 
+Route::get('/communication/public', 'Backoffice\Communication@publicArea')->name('commPublicPage');
+
+
 Route::get('/innovation', 'Site_v2\Home@pageInnovation')->name('innovationPageV2');
 Route::get('/qualification', 'Site_v2\Home@pageQualification')->name('qualificationPageV2');
 Route::get('/internationalization', 'Site_v2\Home@pageInternationalization')->name('internationalizationPageV2');
@@ -327,8 +334,15 @@ Route::group(['prefix' => 'admin'], function () {
 
 		//Communication
 		Route::get('/communication', 'Backoffice\Communication@index')->name('mainPageComun');
-		Route::get('/communication/add', 'Backoffice\Communication@addItemPage')->name('comunAdd');
-		//Route::get('/orders-invoice/{id}', 'Backoffice\Orders@ordersInvoice')->name('invoiceOrderPageB');
+		// add page 
+		Route::get('/communication/add-page', 'Backoffice\Communication@addItemPage')->name('comunAdd');
+		Route::post('/communication/add', 'Backoffice\Communication@addItemDB')->name('comunAdd_DB');
+		// edit page 
+		Route::get('/communication/edit-page/{id}', 'Backoffice\Communication@editarItem')->name('comunEdit');
+		Route::post('/communication/edit', 'Backoffice\Communication@updateItem')->name('comunEdit_DB');
+		// delete item 
+		Route::post('/communication/delete', 'Backoffice\Communication@apagarItem')->name('comuniDelete');
+
 
 		Route::post('/orders-addLine', 'Backoffice\Orders@addLineProduct')->name('ordersAddLineProductPageB');
 		Route::post('/orders-form', 'Backoffice\Orders@formEdit')->name('ordersFormB');

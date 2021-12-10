@@ -302,7 +302,6 @@ class Communication extends Controller
         $ficheiro = $query->file;
         $path =  $query->path;
 
-
         $file =  "../public_html/img/comunicacao/" . $ficheiro;
         $name = basename($file);
         return response()->download($file, $name);

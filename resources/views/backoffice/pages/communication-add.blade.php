@@ -15,7 +15,7 @@
 
 <form id="@if($funcao=='addComuni'){{'addComunication'}}@else {{'editComunication'}} @endif" method="POST"
     enctype="multipart/form-data"
-    action="@if($funcao=='addComuni'){{ route('comunAdd_DB') }}  @else {{route('comunEdit_DB')}} @endif">
+    action="@if($funcao=='addComuni'){{route('comunAdd_DB')}}@else{{route('comunEdit_DB')}}@endif">
 
     {{ csrf_field() }}
     <input type="hidden" id="id" name="id" value="@if(isset($obj->id)){{ $obj->id }}@endif">
@@ -63,8 +63,7 @@
                 <label for="selecao-arquivo_xs" class="lb-40 bt-azul float-right">
                     <i class="fas fa-upload"></i>
                 </label>
-                <input id="selecao-arquivo_xs" type="file" name="ficheiro" onchange="lerFicheiros(this,'uploads_xs');"
-                    accept="image/*">
+                <input id="selecao-arquivo_xs" type="file" name="ficheiro" onchange="lerFicheiros(this,'uploads_xs');">
             </div>
             <label class="lb-40 bt-azul float-right" onclick="limparFicheiros('_xs');"><i
                     class="fas fa-trash-alt"></i></label>
@@ -128,7 +127,7 @@
     if(quantidade==1){
         
         $('#'+id).html(nome);
-        //alert(" file ok ")
+       // alert(" size : ")
     }
     else{
         $('#'+id).html(quantidade+' {{ trans('backoffice.selectedFiles') }}');
@@ -160,24 +159,33 @@
           console.log( xhr.statusText )
           console.log( xhr.readyState )
           console.log( xhr.responseText )
+          alert( xhr.responseText )
        },
         success: function(data) {
 
         resp=$.parseJSON(data);
           
-        if(resp.success=='success'){
+        if(resp.success=="success"){
             
             //console.log( resposta )
          // $('#addComunication')[0].reset();
             $("#addComunication").trigger("reset");
-              $("#uploads_xs").empty();
+            $("#uploads_xs").empty();
           $('#myModalSave').modal('show');
        
         }
+        else if(resp.error!="init"){
+            
+            // alert(resp.error);
+          //  console.log(resp.success)
+            $.notific8(resp.error);
+        }
         else {
             
-        alert(resp.error);
-        console.log(resp.success)
+         alert(data);
+         // $.notific8(data);
+        //console.log(resp.success)
+        
         }
        }
       })

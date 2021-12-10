@@ -65,19 +65,18 @@ class Communication extends Controller
     public function addItemDB(Request $request)
     {
 
-
         $nome = trim($request->nome);
         $descricao = trim($request->descricao);
         $tipo = trim($request->tipo);
         $path = "public_html/img/comunicacao";
         $token = str_random(12);
-        $response  =  ['init' =>  '0'];
+        $response  =  ['error' =>  'init', 'success' =>  'init'];
 
         if (!empty($nome) || !empty($descricao)) {
 
             $validarFicheiro = json_decode(self::validarFicheiro($request, $path, $tipo), true);
 
-            if ($validarFicheiro['success'] == "ok") {
+            if ($validarFicheiro['success'] != "" && $validarFicheiro['success'] == "ok") {
 
                 $response['file_name'] = $validarFicheiro['file_name'];
                 $query = \DB::table('img_comercial')
@@ -98,21 +97,23 @@ class Communication extends Controller
                             'file' => $response['file_name']
                         ]);
 
-                    $response = ['success' =>  'success'];
+                    $response['success'] = "success";
                 } else {
                     self::apagarFicheiro($path,  $response['file_name']);
-                    $response = ['error' =>  'ficheiro existe'];
+                    //$response = ['error' =>  'ficheiro existe'];
+                    $response['error'] = "ficheiro existe";
                 }
             } else {
-                $response['error'] =  $validarFicheiro['error'];
+                $response['error'] = $validarFicheiro['error'];
             }
         } else {
 
             self::apagarFicheiro($path,  $response['file_name']);
-            $response = ['error' =>  'campos vazios'];
+            //$response = ['error' =>  'campos vazios'];
+            $response['error'] = "campos vazios";
         }
 
-        return  json_encode($response, true);
+        return json_encode($response, true);
     }
 
 
@@ -143,7 +144,7 @@ class Communication extends Controller
             $validExtesion = array("jpg", "jpeg",  "png", "svg", "pdf");
             $pasta = base_path($path);
             $id = str_random(3);
-            $response = ['init' => '0'];
+            $response = ['error' => 'init', 'success' => 'init', 'file_name' => 'init'];
 
             // verifica extens達o aceite
             if (in_array($extensao, $validExtesion)) {
@@ -162,26 +163,27 @@ class Communication extends Controller
                 }
 
                 //verifica tamanho suportado
-                $maxSize = 15728640;  //   15728640 byte = 15MB  https://convertlive.com/u/convert/megabytes/to/bytes#15
+                $maxSize =   15728640;  //  172000  15728640 byte = 15MB  https://convertlive.com/u/convert/megabytes/to/bytes#15
                 if (filesize($ficheiro) <= $maxSize) {
 
                     // https://stackoverflow.com/questions/34443451/file-upload-laravel-5
                     $ficheiro->move($pasta . '/', $newName);
-                    $response = [
-                        'success' =>   "ok",
-                        'file_name' =>   $newName
-                    ];
+                    $response['success'] = 'ok';
+                    $response['file_name'] = $newName;
                 } else {
-                    $response = ['error' =>  'tamanho nao suportado'];
+                    //$response = ['error' =>  'tamanho nao suportado'];
+                    $response['error'] = 'tamanho nao suportado';
                 }
             } else {
-                $response = ['error' =>  'extensao invalido'];
+                // $response = ['error' =>  'extensao invalido'];
+                $response['error'] = 'extensao nao suportado';
             }
         } else {
-            $response = ['error' =>  'ficheiro invalido'];
+            //$response = ['error' =>  'ficheiro invalido'];
+            $response['error'] = 'ficheiro invalido';
         }
 
-        return  json_encode($response, true);
+        return json_encode($response, true);
     }
 
 
@@ -301,6 +303,7 @@ class Communication extends Controller
         $query = \DB::table('img_comercial')->where('id', $id)->first();
         $ficheiro = $query->file;
         $path =  $query->path;
+
 
         $file =  "../public_html/img/comunicacao/" . $ficheiro;
         $name = basename($file);

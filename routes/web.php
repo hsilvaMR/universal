@@ -436,7 +436,6 @@ Route::group(['prefix' => 'admin'], function () {
 		Route::get('/gest-certification/{id}', 'Backoffice\GestViewer@index')->name('certificationsIdPageB');
 		Route::get('/gest-certification-process/{id}', 'Backoffice\GestViewer@getProcess')->name('certificationsProcessPageB');
 
-
 		//Certificações
 		Route::get('/gest-certifications', 'Backoffice\Gest@indexCertifications')->name('certificationsPageB');
 		Route::get('/gest-certifications-new', 'Backoffice\Gest@newCertification')->name('certificationsNewPageB');

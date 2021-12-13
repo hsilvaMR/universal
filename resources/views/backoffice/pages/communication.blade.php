@@ -162,11 +162,7 @@
         document.execCommand("copy");
         document.body.removeChild(sampleTextarea);
    }
-    
   
-  
-  
-
   //<!-- PAGINAR -->
    $(document).ready(function(){
     $('#sortable').dataTable()

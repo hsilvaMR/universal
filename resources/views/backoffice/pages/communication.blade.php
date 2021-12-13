@@ -91,6 +91,11 @@
 
 @stop
 
+@section('css')
+<!-- PAGINAR -->
+<link href="{{ asset('backoffice/vendor/datatables/jquery.dataTables.css') }}" rel="stylesheet">
+@stop
+
 @section('javascript')
 <!-- PAGINAR -->
 <script src="{{ asset('backoffice/vendor/datatables/jquery.dataTables.min.js') }}"></script>
@@ -139,7 +144,6 @@
    //texto = url.val();
    //texto.select();
    document.execCommand("copy")
-  
     
   }
   
@@ -164,11 +168,8 @@
   
 
   //<!-- PAGINAR -->
-  $(document).ready(function(){
-    $('#sortable').dataTable({
-      aoColumnDefs: [{ "bSortable": false, "aTargets": [ 0,2,8 ] }],
-      lengthMenu: [[20,50,-1], [20,50,'{{ trans('backoffice.All') }}']],
-    });
+   $(document).ready(function(){
+    $('#sortable').dataTable()
   });
 </script>
 @stop

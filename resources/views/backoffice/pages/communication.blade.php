@@ -55,7 +55,7 @@
 
             <input type="hidden" id="id_copy-{{$val['id']}}" value="{{ route('downloadPage',['id'=>$val['id']]) }}">
             <span class="table-opcao" id="btnShareLink" onclick="copyLink_v2({{$val['id']}})">
-              <i class="fas fa-cloud-download-alt"></i>&nbsp;{{trans('backoffice.commuShare')}}
+              <i class="fas fa-clone"></i>&nbsp;{{trans('backoffice.commuShare')}}
             </span>
 
           </td>

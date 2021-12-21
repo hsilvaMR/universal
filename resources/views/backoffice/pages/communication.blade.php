@@ -5,6 +5,7 @@
 @include('backoffice/includes/crumbs')
 
 <div class="page-titulo">{{ trans('backoffice.comuniBradCromb') }}</div>
+{{-- BTN ADD ITEM  --}}
 <a href="{{ route('comunAdd') }}" class="abt bt-verde modulo-botoes"><i class="fas fa-plus"></i>
   {{ trans('backoffice.commuBtnAdd') }}</a>
 {{-- table  --}}
@@ -84,6 +85,11 @@
 
 @stop
 
+@section('css')
+<!-- PAGINAR -->
+<link href="{{ asset('backoffice/vendor/datatables/jquery.dataTables.css') }}" rel="stylesheet">
+@stop
+
 @section('javascript')
 <!-- PAGINAR -->
 <script src="{{ asset('backoffice/vendor/datatables/jquery.dataTables.min.js') }}"></script>
@@ -123,6 +129,38 @@
       }
     });
   }
+  
+  // copy link 
+  
+  function copyLink_v1(id){
+      
+     /* Get the text field */
+   var url=$('#id_copy-'+id).select();
+   //texto = url.val();
+   //texto.select();
+   document.execCommand("copy")
+    
+  }
+  
+    function copyLink_v2(id){
+        
+       var url = document.getElementById("id_copy-"+id);
+       copyToClipboard(url.value);
+       $.notific8('{{ trans('backoffice.comuniNotifCopyLink') }}');
+    }
+    
+    function copyToClipboard(text) {
+        var sampleTextarea = document.createElement("textarea");
+        document.body.appendChild(sampleTextarea);
+        sampleTextarea.value = text; //save main text in it
+        sampleTextarea.select(); //select textarea contenrs
+        document.execCommand("copy");
+        document.body.removeChild(sampleTextarea);
+   }
+    
+  
+  
+  
 
   function downloadFile(id){
 
@@ -161,11 +199,18 @@
      
 
   //<!-- PAGINAR -->
-  $(document).ready(function(){
-    $('#sortable').dataTable({
-      aoColumnDefs: [{ "bSortable": false, "aTargets": [ 0,2,8 ] }],
-      lengthMenu: [[20,50,-1], [20,50,'{{ trans('backoffice.All') }}']],
-    });
-  });
+   $(document).ready(function(){
+       
+      $('#sortable').dataTable({
+        
+        aoColumnDefs: [{
+			"bSortable": false,
+			"aTargets": [7,2]
+		}]
+        
+     })
+        
+   })
+
 </script>
 @stop

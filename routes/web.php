@@ -42,6 +42,13 @@ Route::get('/', 'Site_v2\Home@index')->name('homePageV2');
 Route::get('/universal-{tipo}', 'Site_v2\Home@pageProduct')->name('productPageV2');
 Route::get('/page-universal', 'Site_v2\Home@pageUniversal')->name('universalPageV2');
 
+/* download de automatico de ficheiros  */
+Route::get('/communication/download/{id}', 'Backoffice\Communication@downloadFile')->name('downloadPage');
+
+// area publica comunicacao 
+Route::get('/communication/public', 'Backoffice\Communication@publicArea')->name('commPublicPage');
+
+
 Route::get('/innovation', 'Site_v2\Home@pageInnovation')->name('innovationPageV2');
 Route::get('/qualification', 'Site_v2\Home@pageQualification')->name('qualificationPageV2');
 Route::get('/internationalization', 'Site_v2\Home@pageInternationalization')->name('internationalizationPageV2');
@@ -327,6 +334,7 @@ Route::group(['prefix' => 'admin'], function () {
 
 		//COMUNICACAO
 		Route::get('/communication', 'Backoffice\Communication@index')->name('mainPageComun');
+<<<<<<< HEAD
 		//add page 
 		Route::get('/communication/add-page', 'Backoffice\Communication@addItemPage')->name('comunAdd');
 		Route::post('/communication/add', 'Backoffice\Communication@addItemDB')->name('comunAdd_DB');
@@ -337,6 +345,16 @@ Route::group(['prefix' => 'admin'], function () {
 		Route::post('/communication/delete', 'Backoffice\Communication@apagarItem')->name('comuniDelete');
 		// download  item 
 		Route::post('/communication/download/{id}', 'Backoffice\Communication@downloadFile')->name('downloadPage');
+=======
+		// add page 
+		Route::get('/communication/add-page', 'Backoffice\Communication@addItemPage')->name('comunAdd');
+		Route::post('/communication/add', 'Backoffice\Communication@addItemDB')->name('comunAdd_DB');
+		// edit page 
+		Route::get('/communication/edit-page/{id}', 'Backoffice\Communication@editarItem')->name('comunEdit');
+		Route::post('/communication/edit', 'Backoffice\Communication@updateItem')->name('comunEdit_DB');
+		// delete item 
+		Route::post('/communication/delete', 'Backoffice\Communication@apagarItem')->name('comuniDelete');
+>>>>>>> server
 
 
 		Route::post('/orders-addLine', 'Backoffice\Orders@addLineProduct')->name('ordersAddLineProductPageB');
@@ -430,7 +448,6 @@ Route::group(['prefix' => 'admin'], function () {
 		//Certificações - Cookie
 		Route::get('/gest-certification/{id}', 'Backoffice\GestViewer@index')->name('certificationsIdPageB');
 		Route::get('/gest-certification-process/{id}', 'Backoffice\GestViewer@getProcess')->name('certificationsProcessPageB');
-
 
 		//Certificações
 		Route::get('/gest-certifications', 'Backoffice\Gest@indexCertifications')->name('certificationsPageB');

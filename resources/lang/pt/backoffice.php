@@ -153,7 +153,6 @@ return [
     'Definitions' => 'Definições',
     'Slide' => 'Slide',
     'Awards' => 'Prémios',
-
     'Giveaways' => 'Passatempos',
     'littleCheese' => 'Queijinho',
     'Questions' => 'Perguntas',
@@ -427,17 +426,17 @@ return [
     'Nickname' => 'Apelido',
 
     /*comunicação*/
-    'communication' => 'Communicação',
+    'communication' => 'Comunicação',
     'comuniBradCromb' => 'Todas as Comunicação',
-    'communiFile' => 'Imagem',
+    'communiFile' => 'Ficheiro',
     'communNome' => 'Nome',
     'comunDesc' => 'Descrição',
-    'communUpdate' => 'atualização',
+    'communUpdate' => 'Atualização',
     'communTipo' => 'Tipo',
     'commuLink' => 'Link',
     'commuAction' => 'Ação',
     'commuDownload' => 'Download',
-    'commuShare' => 'Share link',
+    'commuShare' => 'copiar link',
     'commuBtnAdd' => 'Adicionar',
     'comunicTitulo' => 'Comunicação | Universal',
     'comuniFrName' => 'Nome',
@@ -446,8 +445,15 @@ return [
     'comuniFrFile' => 'Ficheiro',
     'comuniFrTypeR' => 'Rótulo',
     'comuniFrTypeImg' => 'Imagen',
+<<<<<<< HEAD
     'comuniNotifiDelete' => 'Removido com sucesso',
     'comuniNotifiDeleteMessage' => '<p>Tem a certeza que deseja apagar este <b>Item</b>?</p>',
+=======
+    'comuniFrTypeDoc' => 'Documento',
+    'comuniNotifiDelete' => 'Removido com sucesso',
+    'comuniNotifiDeleteMessage' => '<p>Tem a certeza que deseja apagar este <b>Item</b>?</p>',
+    'comuniNotifCopyLink' => 'Link copiado com sucesso',
+>>>>>>> server
 
 
 

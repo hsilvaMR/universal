@@ -9,19 +9,19 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\File;
 
 use Cookie;
+use Response;
+use File;
 
 class Communication extends Controller
 {
-
     private $dados = [];
 
     public function index()
     {
 
-        $this->dados['headTitulo'] = trans('backoffice.ordersTitulo');
+        $this->dados['headTitulo'] = trans('backoffice.comunicTitulo');
         $this->dados['separador'] = "sellerComuni";
         $this->dados['funcao'] = "all";
-
 
         $path = "public_html/img/comunicacao";
         $asset_img_path = "/img/comunicacao";
@@ -29,6 +29,7 @@ class Communication extends Controller
         $array = [];
 
         $query = \DB::table('img_comercial')->orderBy('id', 'DESC')->get();
+
         foreach ($query as $tblCom) {
 
             $avatar = '<img src="' . asset($asset_img_path . "/" . $default_file) . '" class="table-img-circle">';
@@ -47,7 +48,10 @@ class Communication extends Controller
             ];
         }
 
+<<<<<<< HEAD
         //return "build communication area";
+=======
+>>>>>>> server
         $this->dados['array'] = $array;
         return view('backoffice/pages/communication', $this->dados);
     }
@@ -55,14 +59,12 @@ class Communication extends Controller
     public function addItemPage()
     {
 
+
         $this->dados['headTitulo'] = trans('backoffice.comunicTitulo');
         $this->dados['separador'] = "sellerComuni";
         $this->dados['funcao'] = "addComuni";
 
         return view('backoffice/pages/communication-add', $this->dados);
-
-
-        // return "build add  area";
     }
 
     public function addItemDB_v2(Request $request)
@@ -126,11 +128,13 @@ class Communication extends Controller
         $nome = trim($request->nome);
         $descricao = trim($request->descricao);
         $tipo = trim($request->tipo);
+<<<<<<< HEAD
 
+=======
+>>>>>>> server
         $path = "public_html/img/comunicacao";
-        // $asset_img_path = "/img/comunicacao";
-        // $default_file =  "comunicacao.svg";
         $token = str_random(12);
+<<<<<<< HEAD
         $response  = "";
         $nomeFicheiro = "";
         $validarFicheiro = "";
@@ -164,14 +168,125 @@ class Communication extends Controller
 
                 self::apagarFicheiro($path, $nomeFicheiro);
                 $response = "o ficheiro já existe";
+=======
+        $response  =  ['error' =>  'init', 'success' =>  'init'];
+
+        if (!empty($nome) || !empty($descricao)) {
+
+            $validarFicheiro = json_decode(self::validarFicheiro($request, $path, $tipo), true);
+
+            if ($validarFicheiro['success'] != "" && $validarFicheiro['success'] == "ok") {
+
+                $response['file_name'] = $validarFicheiro['file_name'];
+                $query = \DB::table('img_comercial')
+                    ->where('descricao', $descricao)
+                    ->orWhere('file',  $response['file_name'])
+                    ->first();
+                // check item DB 
+                if (empty($query->nome)) {
+
+                    \DB::table('img_comercial')
+                        ->insert([
+                            'nome' => $nome,
+                            'descricao' => $descricao,
+                            'atualizacao' => date('Y-m-d H:i'),
+                            'tipo' => $tipo,
+                            'token' => $token,
+                            'path' => $path,
+                            'file' => $response['file_name']
+                        ]);
+
+                    $response['success'] = "success";
+                } else {
+                    self::apagarFicheiro($path,  $response['file_name']);
+                    //$response = ['error' =>  'ficheiro existe'];
+                    $response['error'] = "ficheiro existe";
+                }
+            } else {
+                $response['error'] = $validarFicheiro['error'];
             }
         } else {
-            $response = $validarFicheiro['error'];
+
+            self::apagarFicheiro($path,  $response['file_name']);
+            //$response = ['error' =>  'campos vazios'];
+            $response['error'] = "campos vazios";
         }
 
-        return  $response;
+        return json_encode($response, true);
     }
 
+
+    public function apagarFicheiro($path, $filename)
+    {
+
+        //   \Storage::delete($path . "/" . $filename);
+
+        $response = "";
+
+        if (file_exists(base_path($path) . '/' .  $filename)) {
+
+            \File::delete(base_path($path) . '/' . $filename);
+            $response = "delete";
+        } else {
+            $response = "error | empty file";
+        }
+        return $response;
+    }
+
+    public function validarFicheiro(Request $request,  $path, $tipo)
+    {
+        // verificar o ficheiro 
+        if ($request->hasFile('ficheiro') && $request->file('ficheiro')->isValid()) {
+
+            $ficheiro = $request->file('ficheiro');
+            $extensao = strtolower($ficheiro->getClientOriginalExtension());
+            $validExtesion = array("jpg", "jpeg",  "png", "svg", "pdf");
+            $pasta = base_path($path);
+            $id = str_random(3);
+            $response = ['error' => 'init', 'success' => 'init', 'file_name' => 'init'];
+
+            // verifica extens達o aceite
+            if (in_array($extensao, $validExtesion)) {
+
+                switch ($tipo) {
+
+                    case "Rotulo":
+                        $newName = 'COM-' . $tipo . '-' . $id . '.' . $extensao;
+                        break;
+                    case "Image":
+                        $newName = 'COM-' . $tipo . '-' . $id . '.' . $extensao;
+                        break;
+                    case "Documento":
+                        $newName = 'COM-' . $tipo . '-' . $id . '.' . $extensao;
+                        break;
+                }
+
+                //verifica tamanho suportado
+                $maxSize =   15728640;  //  172000  15728640 byte = 15MB  https://convertlive.com/u/convert/megabytes/to/bytes#15
+                if (filesize($ficheiro) <= $maxSize) {
+
+                    // https://stackoverflow.com/questions/34443451/file-upload-laravel-5
+                    $ficheiro->move($pasta . '/', $newName);
+                    $response['success'] = 'ok';
+                    $response['file_name'] = $newName;
+                } else {
+                    //$response = ['error' =>  'tamanho nao suportado'];
+                    $response['error'] = 'tamanho nao suportado';
+                }
+            } else {
+                // $response = ['error' =>  'extensao invalido'];
+                $response['error'] = 'extensao nao suportado';
+>>>>>>> server
+            }
+        } else {
+            //$response = ['error' =>  'ficheiro invalido'];
+            $response['error'] = 'ficheiro invalido';
+        }
+
+        return json_encode($response, true);
+    }
+
+<<<<<<< HEAD
     public function apagarFicheiro($path, $filename)
     {
 
@@ -253,15 +368,15 @@ class Communication extends Controller
     }
 
     public function validarFicheiro($ficheiro, $path, $nomeFicheiro,  $tipo)
+=======
+
+    // editar 
+    public function editarItem($id)
+>>>>>>> server
     {
-        // CRIAR FICHEIRO LARAVEL
-        // https://codeanddeploy.com/blog/laravel/laravel-8-file-upload-example 
 
-        // strtoupper()  Retorna string com todos os caracteres do alfabeto convertidos para maiúsculas. 
-        //  strtolower  Retorna string com todos os caracteres do alfabeto convertidos para minúsculas. 
-        // strcasecmp()  Comparação de strings sem diferenciar maiúsculas e minúsculas segura para binário 
-        //$pasta = base_path('public_html/site_v2/img/slide/');
 
+<<<<<<< HEAD
         $response = ['init' => '0'];
         $pasta = dirname($path);
         $antigoNome = '';
@@ -269,50 +384,127 @@ class Communication extends Controller
         $validExtesion = array("jpg", "jpeg",  "png", "svg", "pdf");
         $id = str_random(3);
         if (!empty($ficheiro)) {
+=======
+        $this->dados['headTitulo'] = trans('backoffice.comunicTitulo');
+        $this->dados['separador'] = "sellerComuni";
+        $this->dados['funcao'] = "editComuni";
+        $this->dados['obj'] = \DB::table('img_comercial')->where('id', $id)->first();
 
-            // verifica extensão aceite
-            if (in_array($extensao, $validExtesion)) {
+        return view('backoffice/pages/communication-add', $this->dados);
+    }
+>>>>>>> server
 
-                //verifica tamanho suportado
-                $maxSize = 15728640;  //   15728640 byte = 15MB  https://convertlive.com/u/convert/megabytes/to/bytes#15
-                if (filesize($ficheiro) <= $maxSize) {
 
-                    $holdName = $nomeFicheiro;
-                    $newName = "";
 
-                    switch ($tipo) {
+    // apagar 
+    public function apagarItem(Request $request)
+    {
 
-                        case "Rotulo":
-                            $newName = 'COMUNIC-' . $tipo . $id . '.' . $extensao;
-                            break;
-                        case "Image":
-                            $newName = 'COMUNIC-' . $tipo . $id . '.' . $extensao;
-                            break;
-                    }
+        $id = trim($request->id);
+        $query = \DB::table('img_comercial')->where('id', $id)->first();
+        $response  =  ['init' =>  '0'];
 
-                    if (move_uploaded_file($holdName, $pasta . "/" . $newName)) {
+        if (!empty($query->id)) {
 
-                        $response = ['success' => 'ok'];
-                        $response = ['nameFile' =>  $newName];
-                    } else {
-                        $response = ['error' =>  'Upload error'];
-                    }
-                } else {
+            $file = $query->file;
+            $path = $query->path;
 
-                    $response = ['error' =>  'tamanho nao suportado'];
-                }
-            } else {
-
-                $response = ['error' =>  'extensao invalido'];
-            }
+            //apagarFicheiro($path,  $file)
+            self::apagarFicheiro($path,  $file);
+            \DB::table('img_comercial')->where('id', $id)->delete();
+            $response = ['success' =>  'success'];
         } else {
-
-            $response = ['error' =>  'empty file'];
+            $response = ['error' =>  'id nao existe'];
         }
-
         return  json_encode($response, true);
     }
 
+
+    public function updateItem(Request $request)
+    {
+
+        $id = trim($request->id);
+        $nome = trim($request->nome);
+        $descricao = trim($request->descricao);
+        $tipo = trim($request->tipo);
+        $response  =  ['init' =>  '0'];
+        $path = "public_html/img/comunicacao";
+        $currentFile = trim($request->fileName);
+
+        $ficheiro = $request->file('ficheiro');
+        if (filesize($ficheiro) > 0  && !empty($ficheiro)) {
+
+            $query = \DB::table('img_comercial')->where('id', $id)->first();
+            $currentFile = $query->file;
+            self::apagarFicheiro($path, $currentFile);
+
+            $validarFicheiro = json_decode(self::validarFicheiro_v1($request, $path, $tipo), true);
+
+            if ($validarFicheiro['success'] == "ok") {
+
+                $response['file_name'] = $validarFicheiro['file_name'];
+
+                if (!empty($id) ||  !empty($nome)) {
+                    $updateStatus =  \DB::table('img_comercial')->where('id', $id)->update([
+                        'nome' => $nome,
+                        'descricao' => $descricao,
+                        'atualizacao' => date('Y-m-d H:i'),
+                        'tipo' => $tipo,
+                        'token' => str_random(12),
+                        'path' => $path,
+                        'file' => $response['file_name']
+                    ]);
+
+                    $response = [
+                        'estado' => 'sucesso',
+                        'update' => $updateStatus
+                    ];
+                } else {
+
+                    self::apagarFicheiro($path, $response['file_name']);
+                    $response = ['error' =>  'Deve Preencher os campos'];
+                }
+            } else {
+                $response['error'] =  $validarFicheiro['error'];
+            }
+        } else {
+
+            $updateStatus =  \DB::table('img_comercial')->where('id', $id)->update([
+                'nome' => $nome,
+                'descricao' => $descricao,
+                'atualizacao' => date('Y-m-d H:i'),
+                // 'atualizacao' => date('Y-m-d H:i:s'),
+                'tipo' => $tipo,
+                'token' => str_random(12),
+                'path' => $path,
+                'file' => $currentFile
+            ]);
+
+            $response['estado'] = "sucesso";
+            $response['update'] = $updateStatus;
+            /*$response = [
+                'estado' => 'sucesso',
+                'update' => $updateStatus,
+                 'file' => $currentFile
+            ];*/
+        }
+        return json_encode($response, true);
+    }
+
+    public function downloadFile($id)
+    {
+
+        $query = \DB::table('img_comercial')->where('id', $id)->first();
+        $ficheiro = $query->file;
+        $path =  $query->path;
+
+
+        $file =  "../public_html/img/comunicacao/" . $ficheiro;
+        $name = basename($file);
+        return response()->download($file, $name);
+    }
+
+<<<<<<< HEAD
     public function editarItem_v1($id)
     {
     }
@@ -517,14 +709,43 @@ class Communication extends Controller
     }
 
     public function generateUrl($id, $token, $file)
+=======
+
+    public function publicArea()
+>>>>>>> server
     {
 
-        $join = $id + $token;
+        $this->dados['headTitulo'] = trans('backoffice.comunicTitulo');
+        $this->dados['separador'] = "sellerComuni";
 
-        $resposta = [
-            'url' =>  $join,
-            'file' => $file
-        ];
-        return  json_encode($resposta, true);
+        $path = "public_html/img/comunicacao";
+        $asset_img_path = "/img/comunicacao";
+        $default_file =  "comunicacao.svg";
+        $array = [];
+
+        $query = \DB::table('img_comercial')->orderBy('id', 'DESC')->get();
+        foreach ($query as $tblCom) {
+
+            $avatar = '<img src="' . asset($asset_img_path . "/" . $default_file) . '" class="table-img-circle">';
+            if ($tblCom->path && file_exists(base_path($path . "/" . $tblCom->file))) {
+                $avatar = '<img src="' . asset($asset_img_path . "/" . $tblCom->file) . '" class="table-img-circle">';
+            }
+
+            $array[] = [
+                'id' => $tblCom->id,
+                'nome' => $tblCom->nome,
+                'descr' => $tblCom->descricao,
+                'update' => $tblCom->atualizacao,
+                'tipo' => $tblCom->tipo,
+                'link' => $tblCom->token,
+                'ficheiro' => $avatar
+            ];
+        }
+
+        //return "build communication area";
+        $this->dados['array'] = $array;
+        // return view('backoffice/pages/communication', $this->dados);
+
+        return view(' /site_v2/pages/communication-public', $this->dados);
     }
 }

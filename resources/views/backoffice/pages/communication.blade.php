@@ -162,10 +162,24 @@
         document.execCommand("copy");
         document.body.removeChild(sampleTextarea);
    }
+    
   
+  
+  
+
   //<!-- PAGINAR -->
    $(document).ready(function(){
-    $('#sortable').dataTable()
-  });
+       
+      $('#sortable').dataTable({
+        
+        aoColumnDefs: [{
+			"bSortable": false,
+			"aTargets": [7,2]
+		}]
+        
+     })
+        
+   })
+
 </script>
 @stop

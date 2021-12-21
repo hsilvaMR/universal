@@ -92,9 +92,15 @@
    }
    
     //<!-- PAGINAR -->
-   $(document).ready(function(){
-    $('#sortable').dataTable()
-  });
+    $(document).ready(function(){
+        $('#sortable').dataTable({
+            aoColumnDefs: [{
+				"bSortable": false,
+				"aTargets": [1,6]
+			}]
+			
+        })
+   });
    
 </script>
 

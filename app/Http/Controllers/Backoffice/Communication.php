@@ -163,7 +163,7 @@ class Communication extends Controller
                 }
 
                 //verifica tamanho suportado
-                $maxSize =   15728640;  //  172000  15728640 byte = 15MB  https://convertlive.com/u/convert/megabytes/to/bytes#15
+                $maxSize =   83886080;  // 104857600 Bytes = 100MB    15728640 byte = 15MB  | 1MB =  1048576 Bytes  https://convertlive.com/u/convert/megabytes/to/bytes#15
                 if (filesize($ficheiro) <= $maxSize) {
 
                     // https://stackoverflow.com/questions/34443451/file-upload-laravel-5

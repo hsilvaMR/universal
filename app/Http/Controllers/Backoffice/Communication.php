@@ -146,7 +146,7 @@ class Communication extends Controller
             $id = str_random(3);
             $response = ['error' => 'init', 'success' => 'init', 'file_name' => 'init'];
 
-            // verifica extens達o aceite
+            // verifica extensao aceite
             if (in_array($extensao, $validExtesion)) {
 
                 switch ($tipo) {

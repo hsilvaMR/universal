@@ -134,6 +134,100 @@ class Communication extends Controller
         return $response;
     }
 
+    public function validarFicheiro_v1(Request $request,  $path, $tipo)
+    {
+
+        // verificar o ficheiro 
+
+        $ficheiro = $request->file('ficheiro');
+        $extensao = strtolower($ficheiro->getClientOriginalExtension());
+        $validExtesion = array("jpg", "jpeg",  "png", "svg", "pdf");
+        $pasta = base_path($path);
+        $id = str_random(3);
+        $response = ['error' => 'init', 'success' => 'init', 'file_name' => 'init'];
+        $nomeFicheiro = "init";
+
+        if ($ficheiro->isValid()) {
+
+            // verificar a extensão do ficheiro
+            if (self::validarExtensao($extensao, $validExtesion) == "success") {
+
+
+                // verificar tamanho do ficheiro
+                if (self::validarTamanho($ficheiro) == "success") {
+
+                    // gerar nome do ficheiro
+                    $gerarNome = self::nomearFicheiro($extensao,$id,$tipo )
+                    if ($gerarNome!= "init" && ) {
+
+
+                    }
+                }
+            }
+        }
+    }
+
+    // validar a extensão
+    public function validarExtensao($extensao, $validExtesion)
+    {
+
+        $response = "init";
+
+        if (in_array($extensao, $validExtesion)) {
+
+            $response = "success";
+        } else {
+            $response = "error";
+        }
+
+        return $response;
+    }
+
+    // validar tamanho do ficheiro
+    public function validarTamanho($ficheiro)
+    {
+
+        $response = "init";
+        $maxSize = 83886080;  // 104857600 Bytes = 100MB    15728640 byte = 15MB  | 1MB =  1048576 Bytes  https://convertlive.com/u/convert/megabytes/to/bytes#15
+
+        if (filesize($ficheiro) <= $maxSize) {
+            $response = "success";
+        } else {
+            $response = "error";
+        }
+        return   $response;
+    }
+
+    // atribuição do nome ao ficheiro
+    public function nomearFicheiro($extensao, $tipo, $id)
+    {
+
+        $newName = "init";
+        switch ($tipo) {
+
+            case "Rotulo":
+                $newName = 'COM-' . $tipo . '-' . $id . '.' . $extensao;
+                return   $newName;
+                break;
+            case "Image":
+                $newName = 'COM-' . $tipo . '-' . $id . '.' . $extensao;
+                return   $newName;
+                break;
+            case "Documento":
+                $newName = 'COM-' . $tipo . '-' . $id . '.' . $extensao;
+                return   $newName;
+                break;
+
+            default:
+                $newName = "error";
+                return   $newName;
+                break;
+        }
+    }
+
+
+
+
     public function validarFicheiro(Request $request,  $path, $tipo)
     {
         // verificar o ficheiro 
@@ -163,7 +257,7 @@ class Communication extends Controller
                 }
 
                 //verifica tamanho suportado
-                $maxSize =   83886080;  // 104857600 Bytes = 100MB    15728640 byte = 15MB  | 1MB =  1048576 Bytes  https://convertlive.com/u/convert/megabytes/to/bytes#15
+                $maxSize = 83886080;  // 104857600 Bytes = 100MB    15728640 byte = 15MB  | 1MB =  1048576 Bytes  https://convertlive.com/u/convert/megabytes/to/bytes#15
                 if (filesize($ficheiro) <= $maxSize) {
 
                     // https://stackoverflow.com/questions/34443451/file-upload-laravel-5

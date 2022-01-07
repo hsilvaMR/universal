@@ -1,5 +1,16 @@
 <?php
 
+
+
+
+/*
+
+	    =======================================================================================
+		                  Code by Honório Silva  dasilvah77@gmail.com
+		=======================================================================================
+
+*/
+
 namespace App\Http\Controllers\Backoffice;
 
 use App\Http\Controllers\Controller;
@@ -33,7 +44,17 @@ class Communication extends Controller
 
             $avatar = '<img src="' . asset($asset_img_path . "/" . $default_file) . '" class="table-img-circle">';
             if ($tblCom->path && file_exists(base_path($path . "/" . $tblCom->file))) {
-                $avatar = '<img src="' . asset($asset_img_path . "/" . $tblCom->file) . '" class="table-img-circle">';
+
+                $getExtension = explode(".", $tblCom->file);
+                if ($getExtension[1] == "pdf") {
+
+                    // <i class="fas fa-file-pdf   table-img-circle"></i>
+                    //$avatar = '<img src="' . asset($asset_img_path . "/" . $tblCom->file) . '" class="table-img-circle">';
+                    $avatar = '<div class"text-center" style="color:#3097D1;"><i class="fas ps-5 fa-file-pdf fa-3x"></i></div>';
+                } else {
+
+                    $avatar = '<img src="' . asset($asset_img_path . "/" . $tblCom->file) . '" class="table-img-circle">';
+                }
             }
 
             $array[] = [
@@ -50,6 +71,7 @@ class Communication extends Controller
         $this->dados['array'] = $array;
         return view('backoffice/pages/communication', $this->dados);
     }
+
 
     public function addItemPage()
     {
@@ -75,6 +97,7 @@ class Communication extends Controller
         if (!empty($nome) || !empty($descricao)) {
 
             $validarFicheiro = json_decode(self::validarFicheiro($request, $path, $tipo), true);
+            //$validarFicheiro = json_decode(self::validarFicheiro_v1($request, $path, $tipo), true);
 
             if ($validarFicheiro['success'] != "" && $validarFicheiro['success'] == "ok") {
 
@@ -101,7 +124,7 @@ class Communication extends Controller
                 } else {
                     self::apagarFicheiro($path,  $response['file_name']);
                     //$response = ['error' =>  'ficheiro existe'];
-                    $response['error'] = "ficheiro existe";
+                    $response['error'] = "A descrião do Ficheiro Deve ser Única";
                 }
             } else {
                 $response['error'] = $validarFicheiro['error'];
@@ -134,12 +157,67 @@ class Communication extends Controller
         return $response;
     }
 
+    public function validarFicheiro(Request $request,  $path, $tipo)
+    {
+
+        // verificar o ficheiro
+        if ($request->hasFile('ficheiro') && $request->file('ficheiro')->isValid()) {
+
+            $ficheiro = $request->file('ficheiro');
+            $extensao = strtolower($ficheiro->getClientOriginalExtension());
+            $validExtesion = array("jpg", "jpeg",  "png", "svg", "pdf");
+            $pasta = base_path($path);
+            $id = str_random(3);
+            $response = ['error' => 'init', 'success' => 'init', 'file_name' => 'init'];
+            $newName = "init";
+
+            // verifica extens達o aceite
+            if (in_array($extensao, $validExtesion)) {
+
+                switch ($tipo) {
+
+                    case "Rotulo":
+                        $newName = 'COM-' . $tipo . '-' . $id . '.' . $extensao;
+                        break;
+                    case "Image":
+                        $newName = 'COM-' . $tipo . '-' . $id . '.' . $extensao;
+                        break;
+                    case "Documento":
+                        $newName = 'COM-' . $tipo . '-' . $id . '.' . $extensao;
+                        break;
+                }
+
+                //verifica tamanho suportado
+                $maxSize = 83886080;  //  172000  15728640 byte = 15MB  https://convertlive.com/u/convert/megabytes/to/bytes#15  83886080
+                if (filesize($ficheiro) <= $maxSize) {
+
+                    // https://stackoverflow.com/questions/34443451/file-upload-laravel-5
+                    $ficheiro->move($pasta . '/', $newName);
+                    $response['success'] = 'ok';
+                    $response['file_name'] = $newName;
+                } else {
+                    //$response = ['error' =>  'tamanho nao suportado'];
+                    $response['error'] = 'tamanho nao suportado';
+                }
+            } else {
+                // $response = ['error' =>  'extensao invalido'];
+                $response['error'] = 'extensao nao suportado';
+            }
+        } else {
+            //$response = ['error' =>  'ficheiro invalido'];
+            $response['error'] = 'ficheiro invalido';
+        }
+
+        return json_encode($response, true);
+    }
+
+    //validar ficheiro v2
     public function validarFicheiro_v1(Request $request,  $path, $tipo)
     {
         // verificar o ficheiro 
         $ficheiro = $request->file('ficheiro');
         $extensao = strtolower($ficheiro->getClientOriginalExtension());
-        $validExtesion = array("jpg", "jpeg",  "png", "svg", "pdf");
+        $validExtesion = array("jpg", "jpeg", "png", "svg", "pdf");
         $pasta = base_path($path);
         $id = str_random(3);
         $response = ['error' => 'init', 'success' => 'init', 'file_name' => 'init'];
@@ -168,20 +246,23 @@ class Communication extends Controller
                             }
                         }
                     } else {
-                        $response['error'] = 'erro ao gerar nome';
+                        $response['error'] = 'Falha na Atribuição Nome ao Ficheiro';
                     }
                 } else {
-                    $response['error'] = 'tamanho nao suportado';
+                    $response['error'] = 'Tamanho do Ficheiro Não Suportado';
                 }
             } else {
-                $response['error'] = 'extensao nao suportado';
+                $response['error'] = 'Extensao Não Suportado';
             }
         } else {
-            $response['error'] = 'Ficheiro nao valido';
+            $response['error'] = 'Ficheiro Não Válido';
         }
 
         return json_encode($response, true);
     }
+
+
+    // funcçoes validar ficheiro v2
 
     // validar a extensão
     public function validarExtensao($extensao, $validExtesion)
@@ -223,22 +304,20 @@ class Communication extends Controller
 
             case "Rotulo":
                 $newName = 'COM-' . $tipo . '-' . $id . '.' . $extensao;
-                return   $newName;
                 break;
             case "Image":
                 $newName = 'COM-' . $tipo . '-' . $id . '.' . $extensao;
-                return   $newName;
                 break;
             case "Documento":
                 $newName = 'COM-' . $tipo . '-' . $id . '.' . $extensao;
-                return   $newName;
                 break;
 
             default:
                 $newName = "error";
-                return   $newName;
                 break;
         }
+
+        return  $newName;
     }
 
     //mover ficheiro para pasta destinado
@@ -250,61 +329,6 @@ class Communication extends Controller
         return $response;
     }
 
-
-
-
-
-    public function validarFicheiro(Request $request,  $path, $tipo)
-    {
-        // verificar o ficheiro 
-        if ($request->hasFile('ficheiro') && $request->file('ficheiro')->isValid()) {
-
-            $ficheiro = $request->file('ficheiro');
-            $extensao = strtolower($ficheiro->getClientOriginalExtension());
-            $validExtesion = array("jpg", "jpeg",  "png", "svg", "pdf");
-            $pasta = base_path($path);
-            $id = str_random(3);
-            $response = ['error' => 'init', 'success' => 'init', 'file_name' => 'init'];
-
-            // verifica extensao aceite
-            if (in_array($extensao, $validExtesion)) {
-
-                switch ($tipo) {
-
-                    case "Rotulo":
-                        $newName = 'COM-' . $tipo . '-' . $id . '.' . $extensao;
-                        break;
-                    case "Image":
-                        $newName = 'COM-' . $tipo . '-' . $id . '.' . $extensao;
-                        break;
-                    case "Documento":
-                        $newName = 'COM-' . $tipo . '-' . $id . '.' . $extensao;
-                        break;
-                }
-
-                //verifica tamanho suportado
-                $maxSize = 83886080;  // 104857600 Bytes = 100MB    15728640 byte = 15MB  | 1MB =  1048576 Bytes  https://convertlive.com/u/convert/megabytes/to/bytes#15
-                if (filesize($ficheiro) <= $maxSize) {
-
-                    // https://stackoverflow.com/questions/34443451/file-upload-laravel-5
-                    $ficheiro->move($pasta . '/', $newName);
-                    $response['success'] = 'ok';
-                    $response['file_name'] = $newName;
-                } else {
-                    //$response = ['error' =>  'tamanho nao suportado'];
-                    $response['error'] = 'tamanho nao suportado';
-                }
-            } else {
-                // $response = ['error' =>  'extensao invalido'];
-                $response['error'] = 'extensao nao suportado';
-            }
-        } else {
-            //$response = ['error' =>  'ficheiro invalido'];
-            $response['error'] = 'ficheiro invalido';
-        }
-
-        return json_encode($response, true);
-    }
 
 
     // editar 

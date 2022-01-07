@@ -357,7 +357,6 @@ Route::group(['prefix' => 'admin'], function () {
 		=======================================================================================
 		*/
 
-
 		Route::post('/orders-addLine', 'Backoffice\Orders@addLineProduct')->name('ordersAddLineProductPageB');
 		Route::post('/orders-form', 'Backoffice\Orders@formEdit')->name('ordersFormB');
 		Route::post('/orders-total-form', 'Backoffice\Orders@formTotalEdit')->name('ordersTotalFormB');
@@ -367,8 +366,6 @@ Route::group(['prefix' => 'admin'], function () {
 		//Função do seller
 		Route::get('/orders-pdf/{id}/{id_empresa}', 'Seller\Orders@ordersPdf')->name('ordersPdfB');
 		Route::get('/orders-address-pdf/{id}/{id_morada}/{id_empresa}', 'Seller\Orders@ordersAdressPdf')->name('ordersAdressPdfB');
-
-
 
 		//Prémios
 		Route::get('/awards-all', 'Backoffice\Awards@index')->name('awardsAllPageB');

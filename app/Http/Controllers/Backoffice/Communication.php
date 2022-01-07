@@ -157,10 +157,20 @@ class Communication extends Controller
                 if (self::validarTamanho($ficheiro) == "success") {
 
                     // gerar nome do ficheiro
-                    $gerarNome = self::nomearFicheiro($extensao,$id,$tipo )
-                    if ($gerarNome!= "init" && ) {
+                    $gerarNome = self::nomearFicheiro($extensao, $id, $tipo);
+                    if ($gerarNome != "init" && $gerarNome != "error" &&  $gerarNome != "") {
 
+                        $nomeFicheiro = $gerarNome;
 
+                        if ($nomeFicheiro != "init") {
+
+                            $responseMovFile = self::moverFicheiro($ficheiro, $pasta, $nomeFicheiro);
+                            if ($responseMovFile != "init" && $responseMovFile != "") {
+
+                                $response['success'] = 'ok';
+                                $response['file_name'] = $nomeFicheiro;
+                            }
+                        }
                     }
                 }
             }
@@ -224,6 +234,16 @@ class Communication extends Controller
                 break;
         }
     }
+
+    //mover ficheiro para pasta destinado
+    public function moverFicheiro($ficheiro, $pasta, $novoNome)
+    {
+        $response = "init";
+        $ficheiro->move($pasta . '/', $novoNome);
+        $response = "success";
+        return $response;
+    }
+
 
 
 

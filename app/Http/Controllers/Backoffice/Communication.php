@@ -136,9 +136,7 @@ class Communication extends Controller
 
     public function validarFicheiro_v1(Request $request,  $path, $tipo)
     {
-
         // verificar o ficheiro 
-
         $ficheiro = $request->file('ficheiro');
         $extensao = strtolower($ficheiro->getClientOriginalExtension());
         $validExtesion = array("jpg", "jpeg",  "png", "svg", "pdf");
@@ -171,10 +169,20 @@ class Communication extends Controller
                                 $response['file_name'] = $nomeFicheiro;
                             }
                         }
+                    } else {
+                        $response['error'] = 'erro ao gerar nome';
                     }
+                } else {
+                    $response['error'] = 'tamanho nao suportado';
                 }
+            } else {
+                $response['error'] = 'extensao nao suportado';
             }
+        } else {
+            $response['error'] = 'Ficheiro nao valido';
         }
+
+        return json_encode($response, true);
     }
 
     // validar a extensão

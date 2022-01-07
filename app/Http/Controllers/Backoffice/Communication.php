@@ -150,7 +150,6 @@ class Communication extends Controller
             // verificar a extensão do ficheiro
             if (self::validarExtensao($extensao, $validExtesion) == "success") {
 
-
                 // verificar tamanho do ficheiro
                 if (self::validarTamanho($ficheiro) == "success") {
 
@@ -159,7 +158,6 @@ class Communication extends Controller
                     if ($gerarNome != "init" && $gerarNome != "error" &&  $gerarNome != "") {
 
                         $nomeFicheiro = $gerarNome;
-
                         if ($nomeFicheiro != "init") {
 
                             $responseMovFile = self::moverFicheiro($ficheiro, $pasta, $nomeFicheiro);

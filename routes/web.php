@@ -333,6 +333,14 @@ Route::group(['prefix' => 'admin'], function () {
 		Route::get('/orders-invoice/{id}', 'Backoffice\Orders@ordersInvoice')->name('invoiceOrderPageB');
 
 		//Communication
+
+		/*
+		
+		=======================================================================================
+		                  Code by Honório Silva  dasilvah77@gmail.com
+		=======================================================================================
+		
+		*/
 		Route::get('/communication', 'Backoffice\Communication@index')->name('mainPageComun');
 		// add page 
 		Route::get('/communication/add-page', 'Backoffice\Communication@addItemPage')->name('comunAdd');
@@ -342,6 +350,12 @@ Route::group(['prefix' => 'admin'], function () {
 		Route::post('/communication/edit', 'Backoffice\Communication@updateItem')->name('comunEdit_DB');
 		// delete item 
 		Route::post('/communication/delete', 'Backoffice\Communication@apagarItem')->name('comuniDelete');
+
+		/*
+		=======================================================================================
+		                                      END  
+		=======================================================================================
+		*/
 
 
 		Route::post('/orders-addLine', 'Backoffice\Orders@addLineProduct')->name('ordersAddLineProductPageB');
@@ -353,12 +367,6 @@ Route::group(['prefix' => 'admin'], function () {
 		//Função do seller
 		Route::get('/orders-pdf/{id}/{id_empresa}', 'Seller\Orders@ordersPdf')->name('ordersPdfB');
 		Route::get('/orders-address-pdf/{id}/{id_morada}/{id_empresa}', 'Seller\Orders@ordersAdressPdf')->name('ordersAdressPdfB');
-
-
-
-
-
-
 
 
 
@@ -435,6 +443,7 @@ Route::group(['prefix' => 'admin'], function () {
 		//Certificações - Cookie
 		Route::get('/gest-certification/{id}', 'Backoffice\GestViewer@index')->name('certificationsIdPageB');
 		Route::get('/gest-certification-process/{id}', 'Backoffice\GestViewer@getProcess')->name('certificationsProcessPageB');
+
 
 		//Certificações
 		Route::get('/gest-certifications', 'Backoffice\Gest@indexCertifications')->name('certificationsPageB');

@@ -331,6 +331,27 @@ class Communication extends Controller
 
 
 
+
+    public function moverFicheiro_v2($request, $pasta, $novoNome)
+    {
+
+        //REF:. https://appdividend.com/2018/08/15/laravel-file-upload-example/
+
+        $uploadedFile = $request->file('file');
+        $filename = time() . $uploadedFile->getClientOriginalName();
+
+        Storage::disk('local')->putFileAs(
+            'files/' . $filename,
+            $uploadedFile,
+            $filename
+        );
+
+        // armazenar dados upload na base de dados 
+
+    }
+
+
+
     // editar 
     public function editarItem($id)
     {
@@ -453,6 +474,8 @@ class Communication extends Controller
         $name = basename($file);
         return response()->download($file, $name);
     }
+
+
 
 
     public function publicArea()

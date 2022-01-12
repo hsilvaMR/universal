@@ -329,9 +329,6 @@ class Communication extends Controller
         return $response;
     }
 
-
-
-
     public function moverFicheiro_v2($request, $pasta, $novoNome)
     {
 
@@ -514,4 +511,74 @@ class Communication extends Controller
 
         return view(' /site_v2/pages/communication-public', $this->dados);
     }
+
+    // validar ficheiro v3 
+    public function validarFicheiro_v3($request)
+    {
+
+        $ficheiro = $request->file('ficheiro');
+        $extensao = strtolower($ficheiro->getClientOriginalExtension());
+        $maxSize = 83886080;
+        $path = "public_html/img/comunicacao";
+        $nomeFicheiro = "init";
+        $response = ['error' => 'init', 'success' => 'init', 'file_name' => 'init'];
+
+        // validar o tamanho do ficheiro 
+        if (filesize($ficheiro) <= $maxSize) {
+
+            // verificar a extensão 
+            if ($extensao == "jpg" || $extensao == "svg" || $extensao == "jpeg" || $extensao == "png" || $extensao == "pdf") {
+
+                //armazenar o ficheiro 
+                $nomeFicheiro = time() . $extensao;
+                Storage::disk('local')->putFileAs(
+                    $path . '/' . $nomeFicheiro
+                );
+                $response['success'] = 'ok';
+                $response['file_name'] = $nomeFicheiro;
+            } else {
+                $response['error'] = 'Extensao Nao Suportado';
+            }
+        } else {
+            $response['error'] = 'Tamanho do Ficheiro Nao Suportado';
+        }
+    }
+
+    // validar ficheiro v4 
+    public function validarFicheiro_v4($request){
+
+        $ficheiro = $request->file('ficheiro');
+        $extensao = strtolower($ficheiro->getClientOriginalExtension());
+        $maxSize = 83886080;
+        $path = "public_html/img/comunicacao";
+        $nomeFicheiro = "init";
+        $response = ['error' => 'init', 'success' => 'init', 'file_name' => 'init'];
+
+        if (filesize($ficheiro) <= $maxSize) {
+
+            // verificar a extensão 
+            if ($extensao == "jpg" || $extensao == "svg" || $extensao == "jpeg" || $extensao == "png" || $extensao == "pdf") {
+
+                //armazenar o ficheiro 
+                $nomeFicheiro = time() .'.'. $extensao;
+
+                 //armazenar o ficheiro na pasta de destino
+                 $pathTemp = $ficheiro->move(base_path($path),$nomeFicheiro);
+
+                $response['file_name'] = $nomeFicheiro;
+            } else {
+                $response['error'] = 'Extensao Nao Suportado';
+            }
+        } else {
+            $response['error'] = 'Tamanho do Ficheiro Nao Suportado';
+        }
+    }
+
+
+
+    }
+
+
+
+
 }

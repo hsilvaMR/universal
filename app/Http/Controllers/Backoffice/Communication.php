@@ -86,29 +86,25 @@ class Communication extends Controller
 
     public function addItemDB(Request $request)
     {
-
         $nome = trim($request->nome);
         $descricao = trim($request->descricao);
         $tipo = trim($request->tipo);
         $path = "public_html/img/comunicacao";
         $token = str_random(12);
-        $response  =  ['error' =>  'init', 'success' =>  'init'];
+        $response  =  ['error' =>  'init', 'success' =>  'init','file_name' => 'init' ];
 
         if (!empty($nome) || !empty($descricao)) {
 
-            $validarFicheiro = json_decode(self::validarFicheiro($request, $path, $tipo), true);
-            //$validarFicheiro = json_decode(self::validarFicheiro_v1($request, $path, $tipo), true);
+       
+             $validarFicheiro = json_decode(self::validarFicheiro_v3($request), true);
 
-            if ($validarFicheiro['success'] != "" && $validarFicheiro['success'] == "ok") {
-
-                $response['file_name'] = $validarFicheiro['file_name'];
-                $query = \DB::table('img_comercial')
-                    ->where('descricao', $descricao)
-                    ->orWhere('file',  $response['file_name'])
-                    ->first();
+            if ($validarFicheiro['success']!="" && $validarFicheiro['success']=="ok") {
+                
+                $query = \DB::table('img_comercial')->where('nome', $nome)->first();
+                  
                 // check item DB 
-                if (empty($query->nome)) {
-
+                if(empty($query)){
+                
                     \DB::table('img_comercial')
                         ->insert([
                             'nome' => $nome,
@@ -117,27 +113,50 @@ class Communication extends Controller
                             'tipo' => $tipo,
                             'token' => $token,
                             'path' => $path,
-                            'file' => $response['file_name']
+                            'file' => $validarFicheiro['file_name']
                         ]);
 
                     $response['success'] = "success";
-                } else {
-                    self::apagarFicheiro($path,  $response['file_name']);
-                    //$response = ['error' =>  'ficheiro existe'];
-                    $response['error'] = "A descrião do Ficheiro Deve ser Única";
                 }
+                else{
+                
+                    if ($query->nome==$nome && $query->descricao==$descricao && $query->file==$validarFicheiro['file_name'] ) {
+                        
+                         self::apagarFicheiro($path, $response['file_name']);
+                        $response['error'] = "ja existe um ficheiro com mesmo atributos que este ";
+
+                 
+                    } else {
+                     
+                          \DB::table('img_comercial')
+                        ->insert([
+                            'nome' => $nome,
+                            'descricao' => $descricao,
+                            'atualizacao' => date('Y-m-d H:i'),
+                            'tipo' => $tipo,
+                            'token' => $token,
+                            'path' => $path,
+                            'file' => $validarFicheiro['file_name']
+                        ]);
+
+                        $response['success'] = "success"; 
+                    
+                    }
+                
+                }
+            
+            
             } else {
                 $response['error'] = $validarFicheiro['error'];
             }
         } else {
 
             self::apagarFicheiro($path,  $response['file_name']);
-            //$response = ['error' =>  'campos vazios'];
-            $response['error'] = "campos vazios";
+            $response ['error'] = "campos vazios";
         }
 
         return json_encode($response, true);
-    }
+     }
 
 
     public function apagarFicheiro($path, $filename)
@@ -560,7 +579,7 @@ class Communication extends Controller
             if ($extensao == "jpg" || $extensao == "svg" || $extensao == "jpeg" || $extensao == "png" || $extensao == "pdf") {
 
                 //armazenar o ficheiro 
-                $nomeFicheiro = time() .'.'. $extensao;
+                $nomeFicheiro = $ficheiro->getClientOriginalName() .'.'. $extensao;
 
                  //armazenar o ficheiro na pasta de destino
                  $pathTemp = $ficheiro->move(base_path($path),$nomeFicheiro);

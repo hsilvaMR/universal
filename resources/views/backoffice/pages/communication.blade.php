@@ -176,6 +176,9 @@
 			"bSortable": false,
 			"aTargets": [7,2]
 		}]
+    // ATIVAR SCROLL NA TABELA 
+		"scrollY":"450px",
+		"scrollCollapse": true,
         
      })
         

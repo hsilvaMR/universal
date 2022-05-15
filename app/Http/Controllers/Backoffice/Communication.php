@@ -504,7 +504,6 @@ class Communication extends Controller
         return response()->download($file, $name);
     }
 
-<<<<<<< HEAD
     public function editarItem_v1($id)
     {
     }
@@ -709,10 +708,6 @@ class Communication extends Controller
     }
 
     public function generateUrl($id, $token, $file)
-=======
-
-    public function publicArea()
->>>>>>> server
     {
 
         $this->dados['headTitulo'] = trans('backoffice.comunicTitulo');

@@ -137,6 +137,57 @@ class Communication extends Controller
         return json_encode($response, true);
     }
 
+    public function validarFicheiro_v3($request)
+    {
+
+        if ($request->file('ficheiro')->isValid()) {
+
+            $ficheiro = $request->file('ficheiro');
+            $extensao = strtolower($ficheiro->getClientOriginalExtension());
+            $maxSize = 83886080;
+            $path = "public_html/img/comunicacao";
+            $nomeFicheiro = "init";
+            $response = [
+                'error' => 'init',
+                'success' => 'init',
+                'file_name' => 'init'
+            ];
+
+            // validar o tamanho do ficheiro 
+            if (filesize($ficheiro) <= $maxSize) {
+
+                // verificar a extens���o 
+                if ($extensao == "jpg" || $extensao == "svg" || $extensao == "jpeg" || $extensao == "png" || $extensao == "pdf") {
+
+                    // atribui������o do nome 
+                    //$nomeFicheiro = time().'.'.$extensao;
+                    $nomeFicheiro = $ficheiro->getClientOriginalName();
+                    //armazenar o ficheiro na pasta de destino
+                    $pathTemp = $ficheiro->move(base_path($path), $nomeFicheiro);
+
+                    if ($pathTemp) {
+
+                        $response['success'] = 'ok';
+                        $response['file_name'] = $nomeFicheiro;
+                    } else {
+
+                        $response['error'] = 'Falha ao Mover Ficheiro';
+                    }
+                } else {
+                    $response['error'] = 'Extensao Nao Suportado';
+                }
+            } else {
+                $response['error'] = 'Tamanho do Ficheiro Nao Suportado';
+            }
+        } else {
+
+            $response['error'] = 'Ficheiro Invalido';
+        }
+
+
+        return json_encode($response, true);
+    }
+
     public function apagarFicheiro($path, $filename)
     {
 

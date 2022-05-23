@@ -48,10 +48,7 @@ class Communication extends Controller
             ];
         }
 
-<<<<<<< HEAD
         //return "build communication area";
-=======
->>>>>>> server
         $this->dados['array'] = $array;
         return view('backoffice/pages/communication', $this->dados);
     }
@@ -128,64 +125,43 @@ class Communication extends Controller
         $nome = trim($request->nome);
         $descricao = trim($request->descricao);
         $tipo = trim($request->tipo);
-<<<<<<< HEAD
-
-=======
->>>>>>> server
         $path = "public_html/img/comunicacao";
         $token = str_random(12);
-<<<<<<< HEAD
-        $response  = "";
-        $nomeFicheiro = "";
-        $validarFicheiro = "";
-        // public function validarFicheiro($ficheiro, $path,  $nomeFicheiro, $id, $tipo)
-        $query = \DB::table('img_comercial')
-            ->where('nome', $nome)
-            // ->orWhere('file', $nomeFicheiro)
-            ->first();
-
-        if (empty($query->nome)) {
-
-            $validarFicheiro = json_decode(self::validarFicheiro_v1($request, $path, $tipo), true);
-
-            if ($validarFicheiro['success'] == "ok") {
-
-                $nomeFicheiro = $validarFicheiro['file_name'];
-
-                \DB::table('img_comercial')
-                    ->insert([
-                        'nome' => $nome,
-                        'descricao' => $descricao,
-                        'atualizacao' => strtotime(date('Y-m-d H:i:s')),
-                        'tipo' => $tipo,
-                        'token' => $token,
-                        'path' => $path,
-                        'file' => $nomeFicheiro
-                    ]);
-
-                $response  = "success";
-            } else {
-
-                self::apagarFicheiro($path, $nomeFicheiro);
-                $response = "o ficheiro já existe";
-=======
-        $response  =  ['error' =>  'init', 'success' =>  'init'];
+        $response  =  ['error' =>  'init', 'success' =>  'init', 'file_name' => 'init'];
 
         if (!empty($nome) || !empty($descricao)) {
 
-            $validarFicheiro = json_decode(self::validarFicheiro($request, $path, $tipo), true);
+
+            $validarFicheiro = json_decode(self::validarFicheiro_v3($request), true);
 
             if ($validarFicheiro['success'] != "" && $validarFicheiro['success'] == "ok") {
 
-                $response['file_name'] = $validarFicheiro['file_name'];
-                $query = \DB::table('img_comercial')
-                    ->where('descricao', $descricao)
-                    ->orWhere('file',  $response['file_name'])
-                    ->first();
+                $query = \DB::table('img_comercial')->where('nome', $nome)->first();
+
                 // check item DB 
-                if (empty($query->nome)) {
+                if (empty($query)) {
 
                     \DB::table('img_comercial')
+                    ->insert([
+                        'nome' => $nome,
+                        'descricao' => $descricao,
+                        'atualizacao' => date('Y-m-d H:i'),
+                        'tipo' => $tipo,
+                        'token' => $token,
+                        'path' => $path,
+                        'file' => $validarFicheiro['file_name']
+                    ]);
+
+                    $response['success'] = "success";
+                } else {
+
+                    if ($query->nome == $nome && $query->descricao == $descricao && $query->file == $validarFicheiro['file_name']) {
+
+                        self::apagarFicheiro($path, $response['file_name']);
+                        $response['error'] = "ja existe um ficheiro com mesmo atributos que este ";
+                    } else {
+
+                        \DB::table('img_comercial')
                         ->insert([
                             'nome' => $nome,
                             'descricao' => $descricao,
@@ -193,14 +169,11 @@ class Communication extends Controller
                             'tipo' => $tipo,
                             'token' => $token,
                             'path' => $path,
-                            'file' => $response['file_name']
+                            'file' => $validarFicheiro['file_name']
                         ]);
 
-                    $response['success'] = "success";
-                } else {
-                    self::apagarFicheiro($path,  $response['file_name']);
-                    //$response = ['error' =>  'ficheiro existe'];
-                    $response['error'] = "ficheiro existe";
+                        $response['success'] = "success";
+                    }
                 }
             } else {
                 $response['error'] = $validarFicheiro['error'];
@@ -208,85 +181,14 @@ class Communication extends Controller
         } else {
 
             self::apagarFicheiro($path,  $response['file_name']);
-            //$response = ['error' =>  'campos vazios'];
             $response['error'] = "campos vazios";
         }
 
         return json_encode($response, true);
-    }
-
-
-    public function apagarFicheiro($path, $filename)
-    {
-
-        //   \Storage::delete($path . "/" . $filename);
-
-        $response = "";
-
-        if (file_exists(base_path($path) . '/' .  $filename)) {
-
-            \File::delete(base_path($path) . '/' . $filename);
-            $response = "delete";
-        } else {
-            $response = "error | empty file";
-        }
-        return $response;
-    }
-
-    public function validarFicheiro(Request $request,  $path, $tipo)
-    {
-        // verificar o ficheiro 
-        if ($request->hasFile('ficheiro') && $request->file('ficheiro')->isValid()) {
-
-            $ficheiro = $request->file('ficheiro');
-            $extensao = strtolower($ficheiro->getClientOriginalExtension());
-            $validExtesion = array("jpg", "jpeg",  "png", "svg", "pdf");
-            $pasta = base_path($path);
-            $id = str_random(3);
-            $response = ['error' => 'init', 'success' => 'init', 'file_name' => 'init'];
-
-            // verifica extens達o aceite
-            if (in_array($extensao, $validExtesion)) {
-
-                switch ($tipo) {
-
-                    case "Rotulo":
-                        $newName = 'COM-' . $tipo . '-' . $id . '.' . $extensao;
-                        break;
-                    case "Image":
-                        $newName = 'COM-' . $tipo . '-' . $id . '.' . $extensao;
-                        break;
-                    case "Documento":
-                        $newName = 'COM-' . $tipo . '-' . $id . '.' . $extensao;
-                        break;
-                }
-
-                //verifica tamanho suportado
-                $maxSize =   15728640;  //  172000  15728640 byte = 15MB  https://convertlive.com/u/convert/megabytes/to/bytes#15
-                if (filesize($ficheiro) <= $maxSize) {
-
-                    // https://stackoverflow.com/questions/34443451/file-upload-laravel-5
-                    $ficheiro->move($pasta . '/', $newName);
-                    $response['success'] = 'ok';
-                    $response['file_name'] = $newName;
-                } else {
-                    //$response = ['error' =>  'tamanho nao suportado'];
-                    $response['error'] = 'tamanho nao suportado';
-                }
-            } else {
-                // $response = ['error' =>  'extensao invalido'];
-                $response['error'] = 'extensao nao suportado';
->>>>>>> server
-            }
-        } else {
-            //$response = ['error' =>  'ficheiro invalido'];
-            $response['error'] = 'ficheiro invalido';
-        }
 
         return json_encode($response, true);
     }
 
-<<<<<<< HEAD
     public function apagarFicheiro($path, $filename)
     {
 
@@ -368,15 +270,9 @@ class Communication extends Controller
     }
 
     public function validarFicheiro($ficheiro, $path, $nomeFicheiro,  $tipo)
-=======
-
-    // editar 
-    public function editarItem($id)
->>>>>>> server
     {
 
 
-<<<<<<< HEAD
         $response = ['init' => '0'];
         $pasta = dirname($path);
         $antigoNome = '';
@@ -384,15 +280,6 @@ class Communication extends Controller
         $validExtesion = array("jpg", "jpeg",  "png", "svg", "pdf");
         $id = str_random(3);
         if (!empty($ficheiro)) {
-=======
-        $this->dados['headTitulo'] = trans('backoffice.comunicTitulo');
-        $this->dados['separador'] = "sellerComuni";
-        $this->dados['funcao'] = "editComuni";
-        $this->dados['obj'] = \DB::table('img_comercial')->where('id', $id)->first();
-
-        return view('backoffice/pages/communication-add', $this->dados);
-    }
->>>>>>> server
 
 
 
